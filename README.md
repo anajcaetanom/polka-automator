@@ -1,6 +1,6 @@
 # Automation for PolKA Processes
 
-This repository contains scripts and tools to automate tasks related to **polKA** (Polynomial Key-based Architecture for Source Routing), using **Mininet** and **NetworkX**.
+This repository contains scripts and tools to automate tasks related to **PolKA** (Polynomial Key-based Architecture for Source Routing), using **Mininet** and **NetworkX**.
 
 ## 📌 About the Project
 
