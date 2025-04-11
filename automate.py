@@ -110,3 +110,12 @@ def get_connected_edge_number(topology, node):
         if topology.nodes[neighbor]['type'] == 'leaf':
             return get_node_number(topology, neighbor)
     return None
+
+def get_path_between_hosts(topology, host1, host2):
+    try:
+        path = networkx.shortest_path(topology, source=host1, target=host2)
+        core_nodes = [n for n in path if n.startswith("E") and n[1:].isdigit()]
+        return core_nodes
+    except networkx.NetworkXNoPath:
+        print("Não há caminho entre os hosts.")
+        return []
