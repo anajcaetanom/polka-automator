@@ -64,6 +64,11 @@ def networxTopo_to_mininetTopo(topology):
                 self.addLink(u, v)
     return MininetTopo()
 
+def start_mininet():
+    net = Mininet()
+    
+
+
 def get_node_number(topology, node):
     """
     Get the number of a node based on its label.
