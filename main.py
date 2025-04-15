@@ -15,7 +15,10 @@ if __name__ == "__main__":
         [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 1, 0, 1], # s10
     ]
 
-    host = input("Type the source host: ")
+    source = input("Type the source host: ")
     target = input("Type the target host: ")
 
-    path = get_path_between_hosts()
+    path = get_path_between_hosts(source, target)
+
+    # TODO: transmission state (output ports)
+      # encoding?

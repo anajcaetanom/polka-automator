@@ -43,7 +43,7 @@ graph [
     node [ id 31 label "S10" type "core" ]
 
     # =================================
-    #            CONECTIONS
+    #               LINKS
     # =================================
 
     edge [ source 1 target 12 ]

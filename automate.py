@@ -111,11 +111,12 @@ def get_connected_edge_number(topology, node):
             return get_node_number(topology, neighbor)
     return None
 
-def get_path_between_hosts(topology, host1, host2):
+def get_path_between_hosts(host1, host2):
+    topo = networxTopo_to_mininetTopo()
     try:
-        path = networkx.shortest_path(topology, source=host1, target=host2)
+        path = networkx.shortest_path(topo, source=host1, target=host2)
         core_nodes = [n for n in path if n.startswith("E") and n[1:].isdigit()]
         return core_nodes
     except networkx.NetworkXNoPath:
-        print("Não há caminho entre os hosts.")
+        print("There's no valid path between the hosts.")
         return []
