@@ -115,7 +115,7 @@ def get_path_between_hosts(host1, host2):
     topo = networxTopo_to_mininetTopo()
     try:
         path = networkx.shortest_path(topo, source=host1, target=host2)
-        core_nodes = [n for n in path if n.startswith("E") and n[1:].isdigit()]
+        core_nodes = [n for n in path if n.startswith("S") and n[1:].isdigit()]
         return core_nodes
     except networkx.NetworkXNoPath:
         print("There's no valid path between the hosts.")
