@@ -77,14 +77,66 @@ graph [
     edge [ source 10 target 21 ]
     edge [ source 21 target 31 ]
 
-    edge [ source 22 target 23 ]
-    edge [ source 23 target 24 ]
-    edge [ source 24 target 25 ]
-    edge [ source 25 target 26 ]
-    edge [ source 26 target 27 ]
-    edge [ source 27 target 28 ]
-    edge [ source 28 target 29 ]
-    edge [ source 29 target 30 ]
-    edge [ source 30 target 31 ]
+    edge [ 
+        source 22 
+        target 23 
+        src_port "s1-eth2"
+        dst_port "s2-eth2"
+    ]
+
+    edge [ 
+        source 23 
+        target 24 
+        src_port "s2-eth3"
+        dst_port "s3-eth2"
+    ]
+
+    edge [ 
+        source 24 
+        target 25 
+        src_port "s24-eth3"
+        dst_port "s25-eth2"
+    ]
+
+    edge [ 
+        source 25 
+        target 26 
+        src_port "s25-eth3"
+        dst_port "s26-eth2"
+    ]
+
+    edge [ 
+        source 26 
+        target 27 
+        src_port "s26-eth3"
+        dst_port "s27-eth2"
+    ]
+
+    edge [ 
+        source 27 
+        target 28 
+        src_port "s27-eth3"
+        dst_port "s28-eth2"
+    ]
+
+    edge [ 
+        source 28 
+        target 29 
+        src_port "s28-eth3"
+        dst_port "s29-eth2"
+    ]
+    edge [ 
+        source 29 
+        target 30 
+        src_port "s29-eth3"
+        dst_port "s30-eth2"
+    ]
+
+    edge [ 
+        source 30 
+        target 31 
+        src_port "s30-eth3"
+        dst_port "s31-eth2"
+    ]
 
 ]
