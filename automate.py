@@ -120,3 +120,17 @@ def get_path_between_hosts(host1, host2):
     except networkx.NetworkXNoPath:
         print("There's no valid path between the hosts.")
         return []
+    
+def attribute_irred_poly_to_nodes(topology):
+    """
+    Attribute irreducible polynomials to core nodes.
+    """
+    # List of irreducible polynomials
+    irred_polys = []
+
+    # attribute
+    i = 0
+    for node in topology.nodes():
+        if topology.nodes[node][type] == 'core':
+            topology.nodes[node]['node_id'] = irred_polys[i]
+            i += 1
