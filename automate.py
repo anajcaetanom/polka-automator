@@ -5,6 +5,7 @@ from mininet.net import Mininet
 from mininet.topo import Topo
 from mininet.log import setLogLevel, info
 from mininet.cli import CLI
+from  import P4Switch
 
 from aux import *
 
@@ -16,7 +17,7 @@ def load_topology():
     topology = networkx.read_gml(file, label='label')
     return topology
 
-def networxTopo_to_mininetTopo(topology):
+def networkxTopo_to_mininetTopo(topology):
     """
     Convert a NetworkX topology to a Mininet topology.
     """
@@ -24,7 +25,7 @@ def networxTopo_to_mininetTopo(topology):
         def build(self):
             # Add hosts and switches to the Mininet topology
             for node in topology.nodes():
-                node_number = get_node_number(topology, node)
+                node_number = get_node_number(node)
                 if topology.nodes[node]['type'] == 'host':
                     edge_number = get_connected_edge_number(topology, node)
                     ip = f"10.0.{edge_number}.{node_number}"

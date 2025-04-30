@@ -1,14 +1,11 @@
 from automate import *
 from aux import *
 
-# topology macro #
-NETWORKX_TOPO = load_topology()
-# MININET_TOPO = networxTopo_to_mininetTopo(NETWORKX_TOPO)
-##################
-
 if __name__ == "__main__":
 
-    # TODO: count the number of core nodes and atribute the polynomial to each node based on the list of irred polynoms
+    NETWORKX_TOPO = load_topology()
+    MININET_TOPO = networkxTopo_to_mininetTopo(NETWORKX_TOPO)
+
     node_ids = [
         [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 1], 
         [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1], 

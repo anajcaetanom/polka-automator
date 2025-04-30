@@ -4,12 +4,11 @@ import networkx
 #                 aux functions                     
 ##################################################
 
-def get_node_number(topology, node):
+def get_node_number(node):
     """
     Get the number of a node based on its label.
     """
-    label = topology.nodes[node].get('label')
-    return int(label[1:])
+    return int(node[1:])
 
 def get_connected_edge_number(topology, node):
     """
@@ -60,7 +59,7 @@ def menu(all_paths):
     while True:
         try:
             option = int(input("Type the number of a path to choose, or 0 to quit: "))
-            if (option == "0"):
+            if (option == 0):
                 print("Exiting...")
                 break
             elif (1 <= option <= len(all_paths)):
