@@ -6,6 +6,8 @@ from mininet.topo import Topo
 from mininet.log import setLogLevel, info
 from mininet.cli import CLI
 
+from aux import *
+
 def load_topology():
     """
     Load a topology from a GML file.
@@ -67,14 +69,8 @@ def networxTopo_to_mininetTopo(topology):
     
     return MininetTopo() # retorna uma instancia da topologia mininet
 
-
-# topology macro #
-NETWORKX_TOPO = load_topology()
-MININET_TOPO = networxTopo_to_mininetTopo(NETWORKX_TOPO)
-##################
-
-def run_mininet():
-    net = Mininet(topo=MININET_TOPO)
+def run_mininet(topology):
+    net = Mininet(topo=topology)
     info("*** Starting network\n")
     net.start()
     net.staticArp()
@@ -92,47 +88,3 @@ def run_mininet():
     net.stop()
 
 
-##################################################
-#                 aux functions                     
-##################################################
-
-def get_node_number(node):
-    """
-    Get the number of a node based on its label.
-    """
-    label = NETWORKX_TOPO.nodes[node]['label']
-    return int(label[1:])
-
-def get_connected_edge_number(node):
-    """
-    Get the number of the edge node (leaf) connected to the given node.
-    Returns None if no edge node is found among neighbors.
-    """
-    neighbors = list(NETWORKX_TOPO.neighbors(node))
-    for neighbor in neighbors:
-        if NETWORKX_TOPO.nodes[neighbor]['type'] == 'leaf':
-            return get_node_number(neighbor)
-    return None
-
-def get_all_paths_between_hosts(host1, host2):
-    try:
-        all_paths = list(networkx.all_simple_paths(NETWORKX_TOPO, source=host1, target=host2))
-        if not all_paths:
-            print
-    except networkx.NetworkXNoPath:
-        print("There are no valid paths between the hosts.")
-        return []
-    
-def attribute_irred_poly_to_nodes():
-    """
-    Attribute irreducible polynomials to core nodes.
-    """
-    # List of irreducible polynomials
-    irred_polys = []
-
-    # attribute
-    i = 0
-    for node in NETWORKX_TOPO.nodes():
-        if NETWORKX_TOPO.nodes[node][type] == 'core':
-            NETWORKX_TOPO.nodes[node]['node_id'] = irred_polys[i]
-            i += 1
