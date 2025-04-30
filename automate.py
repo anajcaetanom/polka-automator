@@ -67,10 +67,14 @@ def networxTopo_to_mininetTopo(topology):
     
     return MininetTopo() # retorna uma instancia da topologia mininet
 
+
+# topology macro #
+NETWORKX_TOPO = load_topology()
+MININET_TOPO = networxTopo_to_mininetTopo(NETWORKX_TOPO)
+##################
+
 def run_mininet():
-    networkx_topo = load_topology()
-    topo = networxTopo_to_mininetTopo(networkx_topo)
-    net = Mininet(topo=topo)
+    net = Mininet(topo=MININET_TOPO)
     info("*** Starting network\n")
     net.start()
     net.staticArp()
@@ -88,40 +92,38 @@ def run_mininet():
     net.stop()
 
 
-
 ##################################################
 #                 aux functions                     
 ##################################################
 
-def get_node_number(topology, node):
+def get_node_number(node):
     """
     Get the number of a node based on its label.
     """
-    label = topology.nodes[node]['label']
+    label = NETWORKX_TOPO.nodes[node]['label']
     return int(label[1:])
 
-def get_connected_edge_number(topology, node):
+def get_connected_edge_number(node):
     """
     Get the number of the edge node (leaf) connected to the given node.
     Returns None if no edge node is found among neighbors.
     """
-    neighbors = list(topology.neighbors(node))
+    neighbors = list(NETWORKX_TOPO.neighbors(node))
     for neighbor in neighbors:
-        if topology.nodes[neighbor]['type'] == 'leaf':
-            return get_node_number(topology, neighbor)
+        if NETWORKX_TOPO.nodes[neighbor]['type'] == 'leaf':
+            return get_node_number(neighbor)
     return None
 
-def get_path_between_hosts(host1, host2):
-    topo = networxTopo_to_mininetTopo()
+def get_all_paths_between_hosts(host1, host2):
     try:
-        path = networkx.shortest_path(topo, source=host1, target=host2)
-        core_nodes = [n for n in path if n.startswith("S") and n[1:].isdigit()]
-        return core_nodes
+        all_paths = list(networkx.all_simple_paths(NETWORKX_TOPO, source=host1, target=host2))
+        if not all_paths:
+            print
     except networkx.NetworkXNoPath:
-        print("There's no valid path between the hosts.")
+        print("There are no valid paths between the hosts.")
         return []
     
-def attribute_irred_poly_to_nodes(topology):
+def attribute_irred_poly_to_nodes():
     """
     Attribute irreducible polynomials to core nodes.
     """
@@ -130,7 +132,7 @@ def attribute_irred_poly_to_nodes(topology):
 
     # attribute
     i = 0
-    for node in topology.nodes():
-        if topology.nodes[node][type] == 'core':
-            topology.nodes[node]['node_id'] = irred_polys[i]
+    for node in NETWORKX_TOPO.nodes():
+        if NETWORKX_TOPO.nodes[node][type] == 'core':
+            NETWORKX_TOPO.nodes[node]['node_id'] = irred_polys[i]
             i += 1
