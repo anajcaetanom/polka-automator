@@ -1,3 +1,5 @@
+#!/home/p4/src/p4dev-python-venv/bin/python
+
 from automate import *
 from aux import *
 
@@ -19,6 +21,8 @@ if __name__ == "__main__":
         [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 1, 0, 1], 
     ]
 
+    teste(MININET_TOPO)
+
     print("Insering irred poly (node-ID)...")
     attribute_irred_poly_to_nodes(NETWORKX_TOPO, node_ids)
 
@@ -35,7 +39,6 @@ if __name__ == "__main__":
     print("0: Quit")
 
     chosen_path = menu(all_paths)
-
 
     
 

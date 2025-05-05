@@ -1,3 +1,5 @@
+#!/home/p4/src/p4dev-python-venv/bin/python
+
 import os
 import networkx
 
@@ -5,7 +7,7 @@ from mininet.net import Mininet
 from mininet.topo import Topo
 from mininet.log import setLogLevel, info
 from mininet.cli import CLI
-from  import P4Switch
+from p4_mininet import P4Switch
 
 from aux import *
 
@@ -64,11 +66,20 @@ def networkxTopo_to_mininetTopo(topology):
                         cls=P4Switch,
                     )
 
+            
             # Add links between nodes
-            for u, v in topology.edges():
-                self.addLink(u, v, bw=10)
+            #for u, v in topology.edges():
+            #    self.addLink(u, v, bw=10)
     
     return MininetTopo() # retorna uma instancia da topologia mininet
+
+def teste(topology):
+    net = Mininet(topo=topology)
+    for host in net.hosts:
+        print(host)
+
+    for switch in net.switches:
+        print(switch)
 
 def run_mininet(topology):
     net = Mininet(topo=topology)
