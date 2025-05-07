@@ -41,12 +41,13 @@ def networkxTopo_to_mininetTopo(topology):
                     config = path + f"/polka/config/e{node_number}-commands.txt"
                     # add P4 switches (core)
                     self.addSwitch(
-                        f"e{node_number}",
+                        f"E{node_number}",
                         netcfg=True,
-                        json=json_file,
+                        json_path=json_file,
                         thriftport=50100 + node_number,
                         switch_config=config,
                         loglevel='debug',
+                        sw_path="/usr/local/bin/simple_switch",
                         cls=P4Switch,
                     )
 
@@ -57,19 +58,21 @@ def networkxTopo_to_mininetTopo(topology):
                     config = path + f"/polka/config/s{node_number}-commands.txt"
                     # Add P4 switches (core)
                     self.addSwitch(
-                        f"s{node_number}",
+                        f"S{node_number}",
                         netcfg=True,
-                        json=json_file,
+                        json_path=json_file,
                         thriftport=50000 + node_number,
                         switch_config=config,
                         loglevel='debug',
+                        sw_path="/usr/local/bin/simple_switch",
                         cls=P4Switch,
                     )
 
             
             # Add links between nodes
-            #for u, v in topology.edges():
-            #    self.addLink(u, v, bw=10)
+            for u, v in topology.edges():
+                #print(u, v)
+                self.addLink(u, v, bw=10)
     
     return MininetTopo() # retorna uma instancia da topologia mininet
 

@@ -25,6 +25,7 @@ def get_connected_edge_number(topology, node):
 
 def get_all_paths_between_hosts(topology, host1, host2):
     try:
+        # all_simple_paths(): todos os caminhos onde cada nó aparece no máximo uma vez.
         all_paths = list(networkx.all_simple_paths(topology, source=host1, target=host2))
 
         if not all_paths:
@@ -44,10 +45,6 @@ def attribute_irred_poly_to_nodes(topology, irred_polys):
     """
     Attribute irreducible polynomials to core nodes.
     """
-    # List of irreducible polynomials
-    # irred_polys = []
-
-    # attribute
     i = 0
     for node in topology.nodes():
         if topology.nodes[node].get('type') == 'core':
@@ -58,6 +55,11 @@ def menu(all_paths):
     """
     Display a menu for the user to choose a path and return the chosen path.
     """
+
+    for i, path in enumerate(all_paths, 1):
+        print(f"Path {i}: {' -> '.join(path)}")
+    print("0: Quit")
+    
     while True:
         try:
             option = int(input("Type the number of a path to choose, or 0 to quit: "))
@@ -72,6 +74,18 @@ def menu(all_paths):
                 print("Invalid option. Please try again.")
         except ValueError:
             print("Invalid input. Please enter a number.")
+
+def get_output_ports(path, net):
+    output_ports = []
+    for i in range(len(path)-1):
+        current_node = path[i]
+        next_node = path[i+1]
+        
+        # Verificando qual porta do switch leva ao próximo nó
+        #for port, intf in net.get(current_node).intfs.items():
+        #    if next_node in str(intf):
+        #        output_ports.append(port)
+        #        print(f"Switch {current_node} usa a porta {port} para alcançar {next_node}.")
 
 ############### funçoes de teste #####################
 def print_nodes_by_type(topology):
