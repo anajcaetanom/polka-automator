@@ -1,6 +1,7 @@
 #!/home/p4/src/p4dev-python-venv/bin/python
 
 import networkx
+import matplotlib.pyplot as plt
 
 ##################################################
 #                 aux functions                     
@@ -58,35 +59,64 @@ def menu(all_paths):
 
     for i, path in enumerate(all_paths, 1):
         print(f"Path {i}: {' -> '.join(path)}")
-    print("0: Quit")
     
     while True:
         try:
-            option = int(input("Type the number of a path to choose, or 0 to quit: "))
+            option = int(input("\nType the number of a path to choose, or 0 to quit: "))
             if (option == 0):
                 print("Exiting...")
                 break
             elif (1 <= option <= len(all_paths)):
                 chosen_path = all_paths[option - 1]
-                print(f"You chose path {option}.")
+                print(f"You chose path {option}.\n")
                 return chosen_path
             else:
                 print("Invalid option. Please try again.")
         except ValueError:
             print("Invalid input. Please enter a number.")
 
-def get_output_ports(path, net):
+def get_output_ports(path, topology, nx_topo):
+    """
+    Get the output ports of the core nodes for a given path in the topology.
+    """
     output_ports = []
     for i in range(len(path)-1):
         current_node = path[i]
         next_node = path[i+1]
         
-        # Verificando qual porta do switch leva ao próximo nó
-        #for port, intf in net.get(current_node).intfs.items():
-        #    if next_node in str(intf):
-        #        output_ports.append(port)
-        #        print(f"Switch {current_node} usa a porta {port} para alcançar {next_node}.")
+        if nx_topo.nodes[current_node].get('type') == 'core':
+            port = topology.port(current_node, next_node)
+            if isinstance(port, tuple):
+                output_ports.append(port[0]) # coloca só a porta de saída na lista
+            else:
+                output_ports.append(port)
 
+    return output_ports
+
+def decimal_to_binary(output_ports_list):
+    """
+    Convert decimal output ports to binary representation.
+    """
+    binary_list = []
+    for port in output_ports_list:
+        binary = bin(port)[2:]
+        digits = [int(p) for p in binary]
+        binary_list.append(digits)
+
+    return binary_list
+
+def get_node_ids(topology, chosen_path):
+    """
+    Get the node IDs of core nodes in the chosen path.
+    """
+    node_list = []
+    for node in chosen_path:
+        if topology.nodes[node].get('type') == 'core':
+            node_id = topology.nodes[node].get('node_id')
+            node_list.append(node_id)
+
+    return node_list
+        
 ############### funçoes de teste #####################
 def print_nodes_by_type(topology):
     """
@@ -95,3 +125,25 @@ def print_nodes_by_type(topology):
     for node in topology.nodes():
         node_type = topology.nodes[node]['type']
         print(f"Node {node} is of type {node_type}")
+
+def show_nx_topo(topology):
+    pos = networkx.spring_layout(topology)
+    color_map = []
+    for node in topology:
+        type = topology.nodes[node].get('type', '')
+        if type == 'core':
+            color_map.append('blue')
+        elif type == 'leaf':
+            color_map.append('yellow')
+        else:
+            color_map.append('gray')
+
+    networkx.draw(
+        topology, 
+        pos, 
+        with_labels=True, 
+        node_color=color_map,
+        edge_color='lightgray' 
+        )
+    
+    plt.show()

@@ -44,7 +44,7 @@ def networkxTopo_to_mininetTopo(topology):
                         f"E{node_number}",
                         netcfg=True,
                         json_path=json_file,
-                        thriftport=50100 + node_number,
+                        thrift_port=50100 + node_number,
                         switch_config=config,
                         loglevel='debug',
                         sw_path="/usr/local/bin/simple_switch",
@@ -61,7 +61,7 @@ def networkxTopo_to_mininetTopo(topology):
                         f"S{node_number}",
                         netcfg=True,
                         json_path=json_file,
-                        thriftport=50000 + node_number,
+                        thrift_port=50000 + node_number,
                         switch_config=config,
                         loglevel='debug',
                         sw_path="/usr/local/bin/simple_switch",
@@ -71,18 +71,9 @@ def networkxTopo_to_mininetTopo(topology):
             
             # Add links between nodes
             for u, v in topology.edges():
-                #print(u, v)
                 self.addLink(u, v, bw=10)
     
     return MininetTopo() # retorna uma instancia da topologia mininet
-
-def teste(topology):
-    net = Mininet(topo=topology)
-    for host in net.hosts:
-        print(host)
-
-    for switch in net.switches:
-        print(switch)
 
 def run_mininet(topology):
     net = Mininet(topo=topology)
@@ -102,4 +93,6 @@ def run_mininet(topology):
     info("*** Stopping network\n")
     net.stop()
 
-
+if __name__ == "__main__":
+    setLogLevel("info")
+    run_mininet(networkxTopo_to_mininetTopo(load_topology()))
