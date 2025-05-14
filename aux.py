@@ -1,5 +1,6 @@
 #!/home/p4/src/p4dev-python-venv/bin/python
 
+import re
 import networkx
 import matplotlib.pyplot as plt
 
@@ -42,7 +43,7 @@ def get_all_paths_between_hosts(topology, host1, host2):
         print(f"Node not found: {e}")
         return []
     
-def attribute_irred_poly_to_nodes(topology, irred_polys):
+def attribute_node_ids(topology, irred_polys):
     """
     Attribute irreducible polynomials to core nodes.
     """
@@ -51,6 +52,17 @@ def attribute_irred_poly_to_nodes(topology, irred_polys):
         if topology.nodes[node].get('type') == 'core':
             topology.nodes[node]['node_id'] = irred_polys[i]
             i += 1
+
+def get_host(prompt):
+    """
+    Get a valid host input from the user.
+    """
+    while True:
+        host = input(prompt).strip().upper()
+        if re.fullmatch(r"H\d+", host):
+            return host
+        else:
+            print("Invalid input. Please type a valid host like 'H1', 'H2', ...")
 
 def menu(all_paths):
     """
