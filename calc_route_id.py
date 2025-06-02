@@ -1,6 +1,6 @@
 #!/home/p4/src/p4dev-python-venv/bin/python
 
-from automate import *
+from run_topology import *
 from aux import *
 from polka.tools import calculate_routeid, print_poly
 

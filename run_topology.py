@@ -3,11 +3,11 @@
 import os
 import networkx
 
-from mininet.net import Mininet
 from mininet.topo import Topo
 from mininet.log import setLogLevel, info
-from mininet.cli import CLI
-from p4_mininet import P4Switch
+from mn_wifi.cli import CLI
+from mn_wifi.net import Mininet_wifi
+from mn_wifi.bmv2 import P4Switch
 
 from aux import *
 
@@ -41,13 +41,12 @@ def networkxTopo_to_mininetTopo(topology):
                     config = path + f"/polka/config/e{node_number}-commands.txt"
                     # add P4 switches (core)
                     self.addSwitch(
-                        f"E{node_number}",
+                        f"e{node_number}",
                         netcfg=True,
-                        json_path=json_file,
-                        thrift_port=50100 + node_number,
+                        json=json_file,
+                        thriftport=50100 + node_number,
                         switch_config=config,
                         loglevel='debug',
-                        sw_path="/usr/local/bin/simple_switch",
                         cls=P4Switch,
                     )
 
@@ -58,16 +57,14 @@ def networkxTopo_to_mininetTopo(topology):
                     config = path + f"/polka/config/s{node_number}-commands.txt"
                     # Add P4 switches (core)
                     self.addSwitch(
-                        f"S{node_number}",
+                        f"s{node_number}",
                         netcfg=True,
-                        json_path=json_file,
-                        thrift_port=50000 + node_number,
+                        json=json_file,
+                        thriftport=50000 + node_number,
                         switch_config=config,
                         loglevel='debug',
-                        sw_path="/usr/local/bin/simple_switch",
                         cls=P4Switch,
                     )
-
             
             # Add links between nodes
             for u, v in topology.edges():
@@ -76,7 +73,7 @@ def networkxTopo_to_mininetTopo(topology):
     return MininetTopo() # retorna uma instancia da topologia mininet
 
 def run_mininet(topology):
-    net = Mininet(topo=topology)
+    net = Mininet_wifi(topo=topology)
     info("*** Starting network\n")
     net.start()
     net.staticArp()
