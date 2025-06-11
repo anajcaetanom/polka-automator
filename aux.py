@@ -58,11 +58,11 @@ def get_host(prompt):
     Get a valid host input from the user.
     """
     while True:
-        host = input(prompt).strip().upper()
-        if re.fullmatch(r"H\d+", host):
+        host = input(prompt).strip().lower()
+        if re.fullmatch(r"h\d+", host):
             return host
         else:
-            print("Invalid input. Please type a valid host like 'H1', 'H2', ...")
+            print("Invalid input. Please type a valid host like 'h1', 'h2', ...")
 
 def menu(all_paths):
     """
@@ -87,7 +87,7 @@ def menu(all_paths):
         except ValueError:
             print("Invalid input. Please enter a number.")
 
-def get_output_ports(path, topology, nx_topo):
+def get_output_ports(path, net, nx_topo):
     """
     Get the output ports of the core nodes for a given path in the topology.
     """
@@ -95,9 +95,11 @@ def get_output_ports(path, topology, nx_topo):
     for i in range(len(path)-1):
         current_node = path[i]
         next_node = path[i+1]
-        
+    
+        mn_topo = net.topo
+
         if nx_topo.nodes[current_node].get('type') == 'core':
-            port = topology.port(current_node, next_node)
+            port = mn_topo.port(current_node, next_node)
             if isinstance(port, tuple):
                 output_ports.append(port[0]) # coloca só a porta de saída na lista
             else:
