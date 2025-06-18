@@ -1,9 +1,9 @@
-# 0 "polka-core.p4"
-# 0 "<built-in>"
-# 0 "<command-line>"
+# 1 "polka-core.p4"
+# 1 "<built-in>"
+# 1 "<command-line>"
 # 1 "polka-core.p4"
 /* -*- P4_16 -*- */
-# 1 "/usr/local/share/p4c/p4include/core.p4" 1
+# 1 "/usr/share/p4c/p4include/core.p4" 1
 /*
 Copyright 2013-present Barefoot Networks, Inc.
 
@@ -98,7 +98,7 @@ extern bool static_assert(bool check, string message);
 /// Like the above but using a default message.
 extern bool static_assert(bool check);
 # 3 "polka-core.p4" 2
-# 1 "/usr/local/share/p4c/p4include/v1model.p4" 1
+# 1 "/usr/share/p4c/p4include/v1model.p4" 1
 /*
 Copyright 2013-present Barefoot Networks, Inc.
 
@@ -141,7 +141,7 @@ limitations under the License.
 
 
 
-# 1 "/usr/local/share/p4c/p4include/core.p4" 1
+# 1 "/usr/share/p4c/p4include/core.p4" 1
 /*
 Copyright 2013-present Barefoot Networks, Inc.
 
@@ -159,7 +159,7 @@ limitations under the License.
 */
 
 /* This is the P4-16 core library, which declares some built-in P4 constructs using P4 */
-# 44 "/usr/local/share/p4c/p4include/v1model.p4" 2
+# 44 "/usr/share/p4c/p4include/v1model.p4" 2
 
 
 
