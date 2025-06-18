@@ -23,6 +23,7 @@ def get_connected_edge_number(topology, node):
     for neighbor in neighbors:
         if topology.nodes[neighbor]['type'] == 'leaf':
             return get_node_number(neighbor)
+            
     return None
 
 def get_all_paths_between_hosts(topology, host1, host2):
@@ -87,23 +88,32 @@ def menu(all_paths):
         except ValueError:
             print("Invalid input. Please enter a number.")
 
+def get_output_port(net, src, dst):
+    """
+    Returns the output port number of the node 'src' towards the node 'dst'.
+    """
+    try:
+        # output interface from src to dst
+        intf = net.get(src).connectionsTo(net.get(dst))[0][0]
+        # port number (e.g., s1-eth1 → 1)
+        return int(intf.name.split('-')[-1].replace('eth', ''))
+    except IndexError:
+        raise Exception(f"No connection found between {src} and {dst}.")
+    except Exception as e:
+        raise Exception(f"Error getting port from {src} to {dst}: {e}")
+
 def get_output_ports(path, net, nx_topo):
     """
     Get the output ports of the core nodes for a given path in the topology.
     """
     output_ports = []
-    for i in range(len(path)-1):
+    for i in range(len(path) - 1):
         current_node = path[i]
-        next_node = path[i+1]
-    
-        mn_topo = net.topo
+        next_node = path[i + 1]
 
         if nx_topo.nodes[current_node].get('type') == 'core':
-            port = mn_topo.port(current_node, next_node)
-            if isinstance(port, tuple):
-                output_ports.append(port[0]) # coloca só a porta de saída na lista
-            else:
-                output_ports.append(port)
+            port = get_output_port(net, current_node, next_node)
+            output_ports.append(port)
 
     return output_ports
 

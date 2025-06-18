@@ -18,42 +18,42 @@ typedef bit<48> macAddr_t;
 typedef bit<32> ip4Addr_t;
 
 header ethernet_t {
-    macAddr_t dstAddr;
-    macAddr_t srcAddr;
-    bit<16>   etherType;
+    macAddr_t  dstAddr;
+    macAddr_t  srcAddr;
+    bit<16>    etherType;
 }
 
 header srcRoute_t {
-    bit<160>    routeId;
+    bit<160>   routeId;
 }
 
 header ipv4_t {
-    bit<4>    version;
-    bit<4>    ihl;
-    bit<8>    diffserv;
-    bit<16>   totalLen;
-    bit<16>   identification;
-    bit<3>    flags;
-    bit<13>   fragOffset;
-    bit<8>    ttl;
-    bit<8>    protocol;
-    bit<16>   hdrChecksum;
-    ip4Addr_t srcAddr;
-    ip4Addr_t dstAddr;
+    bit<4>     version;
+    bit<4>     ihl;
+    bit<8>     diffserv;
+    bit<16>    totalLen;
+    bit<16>    identification;
+    bit<3>     flags;
+    bit<13>    fragOffset;
+    bit<8>     ttl;
+    bit<8>     protocol;
+    bit<16>    hdrChecksum;
+    ip4Addr_t  srcAddr;
+    ip4Addr_t  dstAddr;
 }
 
 struct metadata {
     bit<160>   routeId;
-    bit<16>   etherType;
-    bit<1> apply_sr;
-    bit<9> port;
+    bit<16>    etherType;
+    bit<1>     apply_sr;
+    bit<9>     port;
 }
 
 struct polka_t_top {
-    macAddr_t dstAddr;
-    macAddr_t srcAddr;
-    bit<16>   etherType;
-    bit<160>    routeId;
+    macAddr_t  dstAddr;
+    macAddr_t  srcAddr;
+    bit<16>    etherType;
+    bit<160>   routeId;
 }
 
 struct headers {
@@ -117,8 +117,8 @@ control process_tunnel_encap(inout headers hdr,
         mark_to_drop(standard_metadata);
     }
 
-    action add_sourcerouting_header (   egressSpec_t port, bit<1> sr, macAddr_t dmac,
-                                        bit<160>  routeIdPacket){
+    action add_sourcerouting_header (egressSpec_t port, bit<1> sr, macAddr_t dmac,
+                                     bit<160>  routeIdPacket) {
 
         standard_metadata.egress_spec = port;
         meta.apply_sr = sr;
@@ -144,12 +144,11 @@ control process_tunnel_encap(inout headers hdr,
 
     apply {
         tunnel_encap_process_sr.apply();
-        if(meta.apply_sr!=1){
+        if (meta.apply_sr!=1) {
             hdr.srcRoute.setInvalid();
-        }else{
+        } else {
             hdr.ethernet.etherType = TYPE_SRCROUTING;
         }
-
     }
 
 }
