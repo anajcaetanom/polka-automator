@@ -45,7 +45,6 @@ header ipv4_t {
 struct metadata {
     bit<160>   routeId;
     bit<16>    etherType;
-    bit<1>     apply_sr;
     bit<9>     port;
 }
 
@@ -111,17 +110,16 @@ control MyVerifyChecksum(inout headers hdr, inout metadata meta) {
 **********************  T U N N E L   E N C A P   ************************
 *************************************************************************/
 control process_tunnel_encap(inout headers hdr,
-                            inout metadata meta,
-                            inout standard_metadata_t standard_metadata) {
+                             inout metadata meta,
+                             inout standard_metadata_t standard_metadata) {
     action tdrop() {
         mark_to_drop(standard_metadata);
     }
 
-    action add_sourcerouting_header (egressSpec_t port, bit<1> sr, macAddr_t dmac,
-                                     bit<160>  routeIdPacket) {
+    action add_sourcerouting_header ( egressSpec_t port, macAddr_t dmac,
+                                      bit<160>  routeIdPacket ) {
 
         standard_metadata.egress_spec = port;
-        meta.apply_sr = sr;
 
         hdr.ethernet.dstAddr = dmac;
 
@@ -144,11 +142,7 @@ control process_tunnel_encap(inout headers hdr,
 
     apply {
         tunnel_encap_process_sr.apply();
-        if (meta.apply_sr!=1) {
-            hdr.srcRoute.setInvalid();
-        } else {
-            hdr.ethernet.etherType = TYPE_SRCROUTING;
-        }
+        hdr.ethernet.etherType = TYPE_SRCROUTING;
     }
 
 }
