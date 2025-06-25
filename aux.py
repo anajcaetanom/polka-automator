@@ -140,6 +140,37 @@ def get_node_ids(topology, chosen_path):
             node_list.append(node_id)
 
     return node_list
+
+def get_leaf_to_core_port_from_path(net, path, topo_nx):
+    """
+    From a given path, identifies the leaf node and returns the output port to the core.
+    """
+    for i in range(len(path) - 1):
+        curr_node = path[i]
+        next_node = path[i + 1]
+
+        if topo_nx.nodes[curr_node].get("type") == "leaf" and topo_nx.nodes[next_node].get("type") == "core":
+            leaf = net.get(curr_node)
+            core = net.get(next_node)
+
+            links = leaf.connectionsTo(core)
+            for intf1, intf2 in links:
+                if intf1.node == leaf:
+                    port_number = leaf.ports[intf1]
+                    return port_number
+
+    print("No leaf-to-core hop found in the path.")
+    return None
+
+def contains_line(filename, target_line):
+    try:
+        with open(filename, 'r') as file:
+            for line in file:
+                if line.strip() == target_line:
+                    return True
+        return False
+    except FileNotFoundError:
+        return False
         
 ############### funçoes de teste #####################
 def print_nodes_by_type(topology):

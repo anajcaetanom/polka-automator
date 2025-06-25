@@ -34,7 +34,6 @@ def loadMininet(nx_topology):
         elif nx_topology.nodes[node]['type'] == 'leaf':
             # read the network configuration
             path = os.path.dirname(os.path.abspath(__file__))
-            print(path)
             json_file = path + "/polka/polka-edge.json"
             config = path + f"/polka/config/e{node_number}-commands.txt"
             # add P4 switches (core)
@@ -51,7 +50,6 @@ def loadMininet(nx_topology):
         elif nx_topology.nodes[node]['type'] == 'core':
             # read the network configuration
             path = os.path.dirname(os.path.abspath(__file__))
-            print(path)
             json_file = path + "/polka/polka-core.json"
             config = path + f"/polka/config/s{node_number}-commands.txt"
             # Add P4 switches (core)
@@ -71,11 +69,3 @@ def loadMininet(nx_topology):
 
     return net  
 
-if __name__ == '__main__':
-    ####### teste #######
-    nx_topo = loadNXtopology()
-    net = loadMininet(nx_topo)
-    topo = net.topo
-    print(topo)
-    ports = net.topo.port('h1', 'e1')
-    print(ports)
