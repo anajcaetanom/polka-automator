@@ -59,14 +59,14 @@ if __name__ == "__main__":
                 
                 print(f"\nFound {len(all_paths)} paths between {source} and {target}:\n")
 
-                chosen_path = menu2(all_paths)
-
                 ############### IDA ###############
+                print('\n####### IDA #######\n')
+                chosen_path = menu2(all_paths)
+                print(f'Path: {chosen_path}')
                 path_node_ids = get_node_ids(NETWORKX_TOPO, chosen_path)
                 port_ids = decimal_to_binary(get_output_ports(chosen_path, MN_NET, NETWORKX_TOPO))
+                print(f'Transmission state: {get_output_ports(chosen_path, MN_NET, NETWORKX_TOPO)}')
                 routeID = calculate_routeid(path_node_ids, port_ids, debug=DEBUG)
-
-                print('\n####### IDA #######\n')
                 target_ip = get_ip_com_mascara(MN_NET.get(target)) # ip com a mascara
                 print(f"Target IP: {target_ip}")
                 output_port = get_leaf_to_core_port_from_path(MN_NET, chosen_path, NETWORKX_TOPO)
@@ -93,12 +93,13 @@ if __name__ == "__main__":
                     print("Table already contains that line.")
                 
                 ############### VOLTA ###############
+                print('\n####### VOLTA #######\n')
                 path_volta = chosen_path[::-1] # ?só inverti o caminho escolhido?
+                print(f'Path: {path_volta}')
                 path_node_ids = get_node_ids(NETWORKX_TOPO, path_volta)
                 port_ids = decimal_to_binary(get_output_ports(path_volta, MN_NET, NETWORKX_TOPO))
+                print(f'Transmission state: {get_output_ports(path_volta, MN_NET, NETWORKX_TOPO)}')
                 routeID = calculate_routeid(path_node_ids, port_ids, debug=DEBUG)
-
-                print('\n####### VOLTA #######\n')
                 target_ip = get_ip_com_mascara(MN_NET.get(source))
                 print(f"Target IP: {target_ip}")
                 output_port = get_leaf_to_core_port_from_path(MN_NET, path_volta, NETWORKX_TOPO)
@@ -124,7 +125,6 @@ if __name__ == "__main__":
                 else:
                     print("Table already contains that line.")
 
-                    
 
                 print('\nInfos adicionadas na tabela.')
                 print('Stopping and cleaning mininet...')
