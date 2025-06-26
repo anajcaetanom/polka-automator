@@ -65,7 +65,21 @@ def get_host(prompt):
         else:
             print("Invalid input. Please type a valid host like 'h1', 'h2', ...")
 
-def menu(all_paths):
+def menu1():
+    while True:
+        print("\nMenu:")
+        print("1. Choose a single path.")
+        print("2. Generate route-ID for all paths.")
+        print("0. Exit.")
+
+        action = input("\nSelect an option: ").strip()
+
+        if action in ('0', '1', '2'):
+            return int(action)
+        else:
+            print("Invalid option. Please enter 0, 1 or 2.")
+
+def menu2(all_paths):
     """
     Display a menu for the user to choose a path and return the chosen path.
     """
@@ -171,6 +185,37 @@ def contains_line(filename, target_line):
         return False
     except FileNotFoundError:
         return False
+
+def get_ip_com_mascara(host):
+    """
+    Retorna o IP com máscara CIDR de um host Mininet.'
+    """
+    intf = host.defaultIntf().name
+    output = host.cmd(f"ip addr show {intf}")
+    match = re.search(r'inet (\d+\.\d+\.\d+\.\d+/\d+)', output)
+    return match.group(1) if match else None
+
+def limpar_e_ordenar_arquivo(caminho_arquivo):
+    with open(caminho_arquivo, 'r') as f:
+        linhas = f.readlines()
+
+    if not linhas:
+        return  # arquivo vazio, nada a fazer
+
+    primeira_linha = linhas[0].rstrip('\n')
+
+    # remove linhas em branco (ou só espaços) das linhas seguintes
+    resto_linhas = [linha.strip() for linha in linhas[1:] if linha.strip() != '']
+
+    # ordena as linhas restantes alfabeticamente
+    resto_linhas.sort()
+
+    # junta tudo com quebras de linha, mantendo a primeira linha
+    linhas_final = [primeira_linha] + resto_linhas
+
+    with open(caminho_arquivo, 'w') as f:
+        for linha in linhas_final:
+            f.write(linha + '\n')
         
 ############### funçoes de teste #####################
 def print_nodes_by_type(topology):

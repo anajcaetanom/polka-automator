@@ -1,7 +1,10 @@
 #!/home/p4/src/p4dev-python-venv/bin/python
+import os
+import subprocess
 
 from load_topology import *
 from aux import *
+
 from polka.tools import calculate_routeid, print_poly, shifting
 
 DEBUG = False
@@ -35,18 +38,19 @@ if __name__ == "__main__":
     MN_NET = loadMininet(NETWORKX_TOPO)
     MN_NET.start()
 
-    print("\nMenu:")
-    print("1. Choose a single path.")
-    print("2. Generate route-ID for all paths.")
-    print("0. Exit.")
+    
 
     while True:
         try:
-            action = int(input("\nSelect an option: "))
+            action = menu1()
             if action == 0:
                 print("Exiting...")
                 break
             elif action == 1:  
+                pasta = os.path.join(os.getcwd(), "polka", "config")
+                if not os.path.exists(pasta):
+                    os.makedirs(pasta)
+
                 source = get_host("\nType the source host (ex: h1): ")
                 target = get_host("Type the target host (ex: h2): ")
 
@@ -55,7 +59,7 @@ if __name__ == "__main__":
                 
                 print(f"\nFound {len(all_paths)} paths between {source} and {target}:\n")
 
-                chosen_path = menu(all_paths)
+                chosen_path = menu2(all_paths)
 
                 ############### IDA ###############
                 path_node_ids = get_node_ids(NETWORKX_TOPO, chosen_path)
@@ -63,7 +67,7 @@ if __name__ == "__main__":
                 routeID = calculate_routeid(path_node_ids, port_ids, debug=DEBUG)
 
                 print('\n####### IDA #######\n')
-                target_ip = MN_NET.get(target).params['ip'] # ip com a mascara
+                target_ip = get_ip_com_mascara(MN_NET.get(target)) # ip com a mascara
                 print(f"Target IP: {target_ip}")
                 output_port = get_leaf_to_core_port_from_path(MN_NET, chosen_path, NETWORKX_TOPO)
                 print(f"Output Port: {output_port}")
@@ -76,12 +80,17 @@ if __name__ == "__main__":
 
                 node_number = get_node_number(source)
                 filename = f'e{node_number}-commands.txt'
+                complete_path = os.path.join(pasta, filename)
                 first_line = "table_set_default tunnel_encap_process_sr tdrop"
-                if not contains_line(filename, first_line):
-                    with open(filename, 'a') as arquivo:  # 'a' = append
+                if not contains_line(complete_path, first_line):
+                    with open(complete_path, 'a') as arquivo:  # 'a' = append
                         arquivo.write(first_line)
-                with open(filename, 'a') as arquivo:  
-                    arquivo.write('\n' + linha)
+                if not contains_line(complete_path, linha):
+                    with open(complete_path, 'a') as arquivo:  
+                        arquivo.write('\n' + linha)
+                    limpar_e_ordenar_arquivo(complete_path)
+                else:
+                    print("Table already contains that line.")
                 
                 ############### VOLTA ###############
                 path_volta = chosen_path[::-1] # ?só inverti o caminho escolhido?
@@ -90,7 +99,7 @@ if __name__ == "__main__":
                 routeID = calculate_routeid(path_node_ids, port_ids, debug=DEBUG)
 
                 print('\n####### VOLTA #######\n')
-                target_ip = MN_NET.get(target).params['ip'] 
+                target_ip = get_ip_com_mascara(MN_NET.get(source))
                 print(f"Target IP: {target_ip}")
                 output_port = get_leaf_to_core_port_from_path(MN_NET, path_volta, NETWORKX_TOPO)
                 print(f"Output Port: {output_port}")
@@ -103,15 +112,24 @@ if __name__ == "__main__":
 
                 node_number = get_node_number(target)
                 filename = f'e{node_number}-commands.txt'
+                complete_path = os.path.join(pasta, filename)
                 first_line = "table_set_default tunnel_encap_process_sr tdrop"
-                if not contains_line(filename, first_line):
-                    with open(filename, 'a') as arquivo:  # 'a' = append
+                if not contains_line(complete_path, first_line):
+                    with open(complete_path, 'a') as arquivo:  # 'a' = append
                         arquivo.write(first_line)
-                with open(filename, 'a') as arquivo:  
-                    arquivo.write('\n' + linha)
+                if not contains_line(complete_path, linha):
+                    with open(complete_path, 'a') as arquivo:
+                        arquivo.write('\n' + linha)
+                    limpar_e_ordenar_arquivo(complete_path)
+                else:
+                    print("Table already contains that line.")
+
+                    
 
                 print('\nInfos adicionadas na tabela.')
-                MN_NET.stop()                
+                print('Stopping and cleaning mininet...')
+                MN_NET.stop()
+                subprocess.run(['sudo', 'mn', '-c']) 
                 break
 
             elif action == 2:
