@@ -186,15 +186,6 @@ def contains_line(filename, target_line):
     except FileNotFoundError:
         return False
 
-def get_ip_com_mascara(host):
-    """
-    Retorna o IP com máscara CIDR de um host Mininet.'
-    """
-    intf = host.defaultIntf().name
-    output = host.cmd(f"ip addr show {intf}")
-    match = re.search(r'inet (\d+\.\d+\.\d+\.\d+/\d+)', output)
-    return match.group(1) if match else None
-
 def limpar_e_ordenar_arquivo(caminho_arquivo):
     with open(caminho_arquivo, 'r') as f:
         linhas = f.readlines()
