@@ -2,6 +2,7 @@
 
 import re
 import networkx
+import ipaddress
 import matplotlib.pyplot as plt
 
 ##################################################
@@ -70,14 +71,15 @@ def menu1():
         print("\nMenu:")
         print("1. Choose a single path.")
         print("2. Generate route-ID for all paths.")
+        print("3. Empty all edge tables.")
         print("0. Exit.")
 
         action = input("\nSelect an option: ").strip()
 
-        if action in ('0', '1', '2'):
+        if action in ('0', '1', '2', '3'):
             return int(action)
         else:
-            print("Invalid option. Please enter 0, 1 or 2.")
+            print("Invalid option. Please enter 0, 1, 2 or 3.")
 
 def menu2(all_paths):
     """
@@ -195,11 +197,21 @@ def limpar_e_ordenar_arquivo(caminho_arquivo):
 
     primeira_linha = linhas[0].rstrip('\n')
 
+    def extrair_ip(linha):
+        partes = linha.split()
+        for parte in partes:
+            if '/' in parte:
+                try:
+                    return ipaddress.ip_network(parte, strict=False)
+                except ValueError:
+                    continue
+        return ipaddress.ip_network("255.255.255.255/32") # fallback
+
     # remove linhas em branco (ou só espaços) das linhas seguintes
     resto_linhas = [linha.strip() for linha in linhas[1:] if linha.strip() != '']
 
     # ordena as linhas restantes alfabeticamente
-    resto_linhas.sort()
+    resto_linhas.sort(key=extrair_ip)
 
     # junta tudo com quebras de linha, mantendo a primeira linha
     linhas_final = [primeira_linha] + resto_linhas

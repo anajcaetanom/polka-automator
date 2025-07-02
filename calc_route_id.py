@@ -38,14 +38,16 @@ if __name__ == "__main__":
     MN_NET = loadMininet(NETWORKX_TOPO)
     MN_NET.start()
 
-    
-
     while True:
         try:
             action = menu1()
             if action == 0:
+                print('Stopping and cleaning mininet...')
+                MN_NET.stop()
+                subprocess.run(['sudo', 'mn', '-c']) 
                 print("Exiting...")
                 break
+
             elif action == 1:  
                 pasta = os.path.join(os.getcwd(), "polka", "config")
                 if not os.path.exists(pasta):
@@ -78,7 +80,9 @@ if __name__ == "__main__":
 
                 linha = f"table_add tunnel_encap_process_sr add_sourcerouting_header {target_ip}/32 => {output_port} {target_mac} {routeID_int}"
 
-                node_number = get_node_number(source)
+                second_node = chosen_path[1]
+                if NETWORKX_TOPO.nodes[second_node].get('type') == 'leaf':
+                    node_number = get_node_number(second_node)
                 filename = f'e{node_number}-commands.txt'
                 complete_path = os.path.join(pasta, filename)
                 first_line = "table_set_default tunnel_encap_process_sr tdrop"
@@ -111,7 +115,9 @@ if __name__ == "__main__":
 
                 linha = f"table_add tunnel_encap_process_sr add_sourcerouting_header {target_ip}/32 => {output_port} {target_mac} {routeID_int}"
 
-                node_number = get_node_number(target)
+                second_node = chosen_path[1]
+                if NETWORKX_TOPO.nodes[second_node].get('type') == 'leaf':
+                    node_number = get_node_number(second_node)
                 filename = f'e{node_number}-commands.txt'
                 complete_path = os.path.join(pasta, filename)
                 first_line = "table_set_default tunnel_encap_process_sr tdrop"
@@ -127,10 +133,6 @@ if __name__ == "__main__":
 
 
                 print('\nInfos adicionadas na tabela.')
-                print('Stopping and cleaning mininet...')
-                MN_NET.stop()
-                subprocess.run(['sudo', 'mn', '-c']) 
-                break
 
             elif action == 2:
                 print("\nGenerating IDs for all paths...\n")
@@ -141,10 +143,11 @@ if __name__ == "__main__":
                 hosts = MN_NET.hosts
                 comandos_por_arquivo = {}    
 
-                for i in range(len(hosts)):  
+                for i in range(len(hosts)):
                     for j in range(len(hosts)):
+
                         if i == j:
-                            continue
+                            source = hosts[i].name
                     
                         source = hosts[i].name
                         target = hosts[j].name
@@ -161,11 +164,16 @@ if __name__ == "__main__":
                         target_ip = MN_NET.get(target).IP()
                         output_port = get_leaf_to_core_port_from_path(MN_NET, chosen_path, NETWORKX_TOPO)
                         target_mac = MN_NET.get(target).MAC()
-                        routeID_int = shifting(routeID)
+                        if i == j:
+                            routeID_int = 0
+                        else:
+                            routeID_int = shifting(routeID)
 
                         linha = f"table_add tunnel_encap_process_sr add_sourcerouting_header {target_ip}/32 => {output_port} {target_mac} {routeID_int}"
 
-                        node_number = get_node_number(source)
+                        second_node = chosen_path[1]
+                        if NETWORKX_TOPO.nodes[second_node].get('type') == 'leaf':
+                            node_number = get_node_number(second_node)
                         filename = f'e{node_number}-commands.txt'
                         complete_path = os.path.join(pasta, filename)
                         first_line = "table_set_default tunnel_encap_process_sr tdrop"
@@ -193,12 +201,16 @@ if __name__ == "__main__":
                         #print(f"Output Port: {output_port}")
                         target_mac = MN_NET.get(source).MAC()
                         #print(f"Target MAC: {target_mac}")
-                        routeID_int = shifting(routeID)
-                        #print(f"RouteID (int): {routeID_int}")
+                        if i == j:
+                            routeID_int = 0
+                        else:
+                            routeID_int = shifting(routeID)
 
                         linha = f"table_add tunnel_encap_process_sr add_sourcerouting_header {target_ip}/32 => {output_port} {target_mac} {routeID_int}"
 
-                        node_number = get_node_number(target)
+                        second_node = chosen_path[1]
+                        if NETWORKX_TOPO.nodes[second_node].get('type') == 'leaf':
+                            node_number = get_node_number(second_node)
                         filename = f'e{node_number}-commands.txt'
                         complete_path = os.path.join(pasta, filename)
                         first_line = "table_set_default tunnel_encap_process_sr tdrop"
@@ -213,9 +225,26 @@ if __name__ == "__main__":
                             print("Table already contains that line.")
 
 
-                        print('\nInfos adicionadas na tabela.')
+                        print('\nInfos adicionadas na tabela.\n')
 
-                break
+            elif action == 3:
+                print("Emptying all tables...")
+
+                pasta = os.path.join(os.getcwd(), "polka", "config")
+                if not os.path.exists(pasta):
+                    os.makedirs(pasta)
+
+                for node in NETWORKX_TOPO.nodes():
+                    node_number = get_node_number(node)
+                    if NETWORKX_TOPO.nodes[node]['type'] == 'leaf':
+                        filename = f'e{node_number}-commands.txt'
+                        complete_path = os.path.join(pasta, filename)
+                        with open(complete_path, 'w'):
+                            pass
+
+                print('\nTables emptied.\n')
+                        
+
         except Exception as e:
             print(f"Error: {e}")
             break 
