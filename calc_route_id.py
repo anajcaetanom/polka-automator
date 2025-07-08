@@ -145,62 +145,62 @@ if __name__ == "__main__":
 
                 for i in range(len(hosts)):
                     for j in range(len(hosts)):
-
-                        if i == j:
-                            source = hosts[i].name
                     
                         source = hosts[i].name
                         target = hosts[j].name
 
                         all_paths = get_all_paths_between_hosts(NETWORKX_TOPO, source, target)
                         if not all_paths:
-                            continue
-                        chosen_path = all_paths[0]
+                            break
 
-                        # --- IDA ---
-                        path_node_ids = get_node_ids(NETWORKX_TOPO, chosen_path)
-                        port_ids = decimal_to_binary(get_output_ports(chosen_path, MN_NET, NETWORKX_TOPO))
-                        routeID = calculate_routeid(path_node_ids, port_ids, debug=DEBUG)
-                        target_ip = MN_NET.get(target).IP()
-                        output_port = get_leaf_to_core_port_from_path(MN_NET, chosen_path, NETWORKX_TOPO)
-                        target_mac = MN_NET.get(target).MAC()
-                        if i == j:
-                            routeID_int = 0
-                        else:
-                            routeID_int = shifting(routeID)
+                        for path in all_paths:
+                            chosen_path = path
 
-                        linha = f"table_add tunnel_encap_process_sr add_sourcerouting_header {target_ip}/32 => {output_port} {target_mac} {routeID_int}"
+                            # --- IDA ---
+                            path_node_ids = get_node_ids(NETWORKX_TOPO, chosen_path)
+                            port_ids = decimal_to_binary(get_output_ports(chosen_path, MN_NET, NETWORKX_TOPO))
+                            routeID = calculate_routeid(path_node_ids, port_ids, debug=DEBUG)
+                            target_ip = MN_NET.get(target).IP()
+                            output_port = get_leaf_to_core_port_from_path(MN_NET, chosen_path, NETWORKX_TOPO)
+                            target_mac = MN_NET.get(target).MAC()
+                            
+                            if i == j:
+                                routeID_int = 0
+                            else:
+                                routeID_int = shifting(routeID)
 
-                        second_node = chosen_path[1]
-                        if NETWORKX_TOPO.nodes[second_node].get('type') == 'leaf':
-                            node_number = get_node_number(second_node)
-                        filename = f'e{node_number}-commands.txt'
-                        complete_path = os.path.join(pasta, filename)
-                        first_line = "table_set_default tunnel_encap_process_sr tdrop"
-                        if not contains_line(complete_path, first_line):
-                            with open(complete_path, 'a') as arquivo:  # 'a' = append
-                                arquivo.write(first_line)
-                        if not contains_line(complete_path, linha):
-                            with open(complete_path, 'a') as arquivo:  
-                                arquivo.write('\n' + linha)
-                            limpar_e_ordenar_arquivo(complete_path)
-                        else:
-                            print("Table already contains that line.")
-                        
-                        ############### VOLTA ###############
-                        #print('\n####### VOLTA #######\n')
-                        path_volta = chosen_path[::-1] # ?só inverti o caminho escolhido?
-                        #print(f'Path: {path_volta}')
-                        path_node_ids = get_node_ids(NETWORKX_TOPO, path_volta)
-                        port_ids = decimal_to_binary(get_output_ports(path_volta, MN_NET, NETWORKX_TOPO))
-                        #print(f'Transmission state: {get_output_ports(path_volta, MN_NET, NETWORKX_TOPO)}')
-                        routeID = calculate_routeid(path_node_ids, port_ids, debug=DEBUG)
-                        target_ip = MN_NET.get(source).IP()
-                        #print(f"Target IP: {target_ip}")
-                        output_port = get_leaf_to_core_port_from_path(MN_NET, path_volta, NETWORKX_TOPO)
-                        #print(f"Output Port: {output_port}")
-                        target_mac = MN_NET.get(source).MAC()
-                        #print(f"Target MAC: {target_mac}")
+                            linha = f"table_add tunnel_encap_process_sr add_sourcerouting_header {target_ip}/32 => {output_port} {target_mac} {routeID_int}"
+
+                            second_node = chosen_path[1]
+                            if NETWORKX_TOPO.nodes[second_node].get('type') == 'leaf':
+                                node_number = get_node_number(second_node)
+                            filename = f'e{node_number}-commands.txt'
+                            complete_path = os.path.join(pasta, filename)
+                            first_line = "table_set_default tunnel_encap_process_sr tdrop"
+                            if not contains_line(complete_path, first_line):
+                                with open(complete_path, 'a') as arquivo:  # 'a' = append
+                                    arquivo.write(first_line)
+                            if not contains_line(complete_path, linha):
+                                with open(complete_path, 'a') as arquivo:  
+                                    arquivo.write('\n' + linha)
+                                limpar_e_ordenar_arquivo(complete_path)
+                            else:
+                                print("Table already contains that line.")
+                            
+                            ############### VOLTA ###############
+                            #print('\n####### VOLTA #######\n')
+                            path_volta = chosen_path[::-1] # ?só inverti o caminho escolhido?
+                            #print(f'Path: {path_volta}')
+                            path_node_ids = get_node_ids(NETWORKX_TOPO, path_volta)
+                            port_ids = decimal_to_binary(get_output_ports(path_volta, MN_NET, NETWORKX_TOPO))
+                            #print(f'Transmission state: {get_output_ports(path_volta, MN_NET, NETWORKX_TOPO)}')
+                            routeID = calculate_routeid(path_node_ids, port_ids, debug=DEBUG)
+                            target_ip = MN_NET.get(source).IP()
+                            #print(f"Target IP: {target_ip}")
+                            output_port = get_leaf_to_core_port_from_path(MN_NET, path_volta, NETWORKX_TOPO)
+                            #print(f"Output Port: {output_port}")
+                            target_mac = MN_NET.get(source).MAC()
+                            #print(f"Target MAC: {target_mac}")
                         if i == j:
                             routeID_int = 0
                         else:

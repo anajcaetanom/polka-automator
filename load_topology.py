@@ -29,16 +29,16 @@ def loadMininet(nx_topology):
             edge_number = get_connected_edge_number(nx_topology, node)
             ip = f"10.0.{edge_number}.{node_number}"
             mac = f"00:00:00:00:{edge_number:02x}:{node_number:02x}"
-            net.addHost(f"h{node_number}", ip=ip, mac=mac)
+            net.addHost(f"{node}", ip=ip, mac=mac)
 
         elif nx_topology.nodes[node]['type'] == 'leaf':
             # read the network configuration
             path = os.path.dirname(os.path.abspath(__file__))
             json_file = path + "/polka/polka-edge.json"
-            config = path + f"/polka/config/e{node_number}-commands.txt"
+            config = path + f"/polka/config/{node}-commands.txt"
             # add P4 switches (core)
             net.addSwitch(
-                f"e{node_number}",
+                f"{node}",
                 netcfg=True,
                 json=json_file,
                 thriftport=50100 + node_number,
@@ -51,10 +51,10 @@ def loadMininet(nx_topology):
             # read the network configuration
             path = os.path.dirname(os.path.abspath(__file__))
             json_file = path + "/polka/polka-core.json"
-            config = path + f"/polka/config/s{node_number}-commands.txt"
+            config = path + f"/polka/config/{node}-commands.txt"
             # Add P4 switches (core)
             net.addSwitch(
-                f"s{node_number}",
+                f"{node}",
                 netcfg=True,
                 json=json_file,
                 thriftport=50000 + node_number,

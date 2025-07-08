@@ -1,5 +1,6 @@
 .venv
 /__pycache__
+polka/config
 polka/polka-edge.p4i
 polka/polka-core.p4i
 polka/polka-edge.json
