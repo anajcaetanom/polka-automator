@@ -1,8 +1,6 @@
 import os
 import networkx
 
-from mininet.log import setLogLevel, info
-from mn_wifi.cli import CLI
 from mn_wifi.net import Mininet_wifi
 from mn_wifi.bmv2 import P4Switch
 

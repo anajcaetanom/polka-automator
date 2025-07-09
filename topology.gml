@@ -5,7 +5,7 @@ graph [
     #              NODES
     # =================================
 
-    # hosts H1 to H11
+    # hosts H1 to H10
     node [ id 1 label "h1" type "host" ]
     node [ id 2 label "h2" type "host" ]
     node [ id 3 label "h3" type "host" ]
@@ -16,7 +16,6 @@ graph [
     node [ id 8 label "h8" type "host" ]
     node [ id 9 label "h9" type "host" ]
     node [ id 10 label "h10" type "host" ]
-    node [ id 11 label "h11" type "host" ]
 
     # edge nodes (leafs) E1 to E10
     node [ id 12 label "e1" type "leaf" ]
@@ -47,7 +46,6 @@ graph [
     # =================================
 
     edge [ source 1 target 12 ]
-    edge [ source 11 target 12 ]
     edge [ source 12 target 22 ]
 
     edge [ source 2 target 13 ]

@@ -70,8 +70,8 @@ if __name__ == "__main__":
                 print('\n####### IDA #######\n')
                 print(f'Path: {chosen_path}')
                 path_node_ids = get_node_ids(NETWORKX_TOPO, chosen_path)
-                port_ids = decimal_to_binary(get_output_ports(chosen_path, MN_NET, NETWORKX_TOPO))
-                print(f'Transmission state: {get_output_ports(chosen_path, MN_NET, NETWORKX_TOPO)}')
+                port_ids = decimal_to_binary(get_output_ports_list(chosen_path, MN_NET, NETWORKX_TOPO))
+                print(f'Transmission state: {get_output_ports_list(chosen_path, MN_NET, NETWORKX_TOPO)}')
                 routeID = calculate_routeid(path_node_ids, port_ids, debug=DEBUG)
                 target_ip = MN_NET.get(target).IP() 
                 print(f"Target IP: {target_ip}")
@@ -96,7 +96,7 @@ if __name__ == "__main__":
                 if not contains_line(complete_path, linha):
                     with open(complete_path, 'a') as arquivo:  
                         arquivo.write('\n' + linha)
-                    limpar_e_ordenar_arquivo(complete_path)
+                    clean_and_sort_file(complete_path)
                 else:
                     print("Table already contains that line.")
                 
@@ -105,8 +105,8 @@ if __name__ == "__main__":
                 path_volta = chosen_path[::-1] # ?só inverti o caminho escolhido?
                 print(f'Path: {path_volta}')
                 path_node_ids = get_node_ids(NETWORKX_TOPO, path_volta)
-                port_ids = decimal_to_binary(get_output_ports(path_volta, MN_NET, NETWORKX_TOPO))
-                print(f'Transmission state: {get_output_ports(path_volta, MN_NET, NETWORKX_TOPO)}')
+                port_ids = decimal_to_binary(get_output_ports_list(path_volta, MN_NET, NETWORKX_TOPO))
+                print(f'Transmission state: {get_output_ports_list(path_volta, MN_NET, NETWORKX_TOPO)}')
                 routeID = calculate_routeid(path_node_ids, port_ids, debug=DEBUG)
                 target_ip = MN_NET.get(source).IP()
                 print(f"Target IP: {target_ip}")
@@ -131,7 +131,7 @@ if __name__ == "__main__":
                 if not contains_line(complete_path, linha):
                     with open(complete_path, 'a') as arquivo:
                         arquivo.write('\n' + linha)
-                    limpar_e_ordenar_arquivo(complete_path)
+                    clean_and_sort_file(complete_path)
                 else:
                     print("Table already contains that line.")
 
@@ -179,7 +179,7 @@ if __name__ == "__main__":
                                 output_port = get_output_port(MN_NET, chosen_path[1], target)
                             else:
                                 path_node_ids = get_node_ids(NETWORKX_TOPO, chosen_path)
-                                port_ids = decimal_to_binary(get_output_ports(chosen_path, MN_NET, NETWORKX_TOPO))
+                                port_ids = decimal_to_binary(get_output_ports_list(chosen_path, MN_NET, NETWORKX_TOPO))
                                 routeID = calculate_routeid(path_node_ids, port_ids, debug=DEBUG)
                                 routeID_int = shifting(routeID)
                                 output_port = get_leaf_to_core_port_from_path(MN_NET, chosen_path, NETWORKX_TOPO)
@@ -202,7 +202,7 @@ if __name__ == "__main__":
                             if not contains_line(complete_path, linha):
                                 with open(complete_path, 'a') as arquivo:  
                                     arquivo.write('\n' + linha)
-                                limpar_e_ordenar_arquivo(complete_path)
+                                clean_and_sort_file(complete_path)
                             else:
                                 print("Table already contains that line.")
 
