@@ -70,6 +70,40 @@ def clean_and_sort_file(caminho_arquivo):
 #              NETWORK TOPOLOGY                 
 ##################################################
 
+def attribute_node_ids(topology, irred_polys):
+    """
+    Attribute irreducible polynomials to core nodes.
+    """
+    try:
+        i = 0
+        for node in topology.nodes():
+            if topology.nodes[node].get('type') == 'core':
+                topology.nodes[node]['node_id'] = irred_polys[i]
+                i += 1
+    except IndexError:
+        print("[Error] Not enough irreducible polynomials for all core nodes.")
+    except Exception as e:
+        print(f"[Error] while assigning node_ids: {e}")
+
+def hex_node_id(node_id):
+    """
+    Converts a binary node_id to a hexadecimal string.
+    """
+    try:
+        # Remove the first occurrence of 1
+        idx = node_id.index(1)
+        trimmed = node_id[idx + 1:]
+
+        # Convert to binary string, then to int, then to hex with zero-padding
+        bin_str = ''.join(str(b) for b in trimmed)
+        hex_value = int(bin_str, 2)
+        return f"0x{hex_value:04x}"
+    except ValueError:
+        print("[Error] No '1' found in node_id.")
+    except Exception as e:
+        print(f"[Error] while converting node_id to hex: {e}")
+
+
 def get_connected_edge_number(topology, node):
     """
     Get the number of the edge node (leaf) connected to the given node.
@@ -126,21 +160,6 @@ def get_all_paths_between_hosts(topology, host1, host2):
     except Exception as e:
         print(f"[Error] while retrieving paths: {e}")
     return []
-    
-def attribute_node_ids(topology, irred_polys):
-    """
-    Attribute irreducible polynomials to core nodes.
-    """
-    try:
-        i = 0
-        for node in topology.nodes():
-            if topology.nodes[node].get('type') == 'core':
-                topology.nodes[node]['node_id'] = irred_polys[i]
-                i += 1
-    except IndexError:
-        print("[Error] Not enough irreducible polynomials for all core nodes.")
-    except Exception as e:
-        print(f"[Error] while assigning node_ids: {e}")
 
 def get_output_port(net, src, dst, debug=False):
     """

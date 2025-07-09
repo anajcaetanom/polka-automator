@@ -30,7 +30,6 @@ def insertNodeID():
     print("\nInsering irred poly (node-ID)...")
     attribute_node_ids(NETWORKX_TOPO, irred_polys)
 
-
 if __name__ == "__main__":
 
     insertNodeID()
@@ -127,7 +126,9 @@ if __name__ == "__main__":
                 pasta = os.path.join(os.getcwd(), "polka", "config")
                 if not os.path.exists(pasta):
                     os.makedirs(pasta)
-            
+
+
+                ################# edge nodes #################
                 hosts = MN_NET.hosts
                 comandos_por_arquivo = {}    
 
@@ -185,6 +186,19 @@ if __name__ == "__main__":
                             else:
                                 print("Table already contains that line.")
 
+                ################# core nodes #################
+                for node in NETWORKX_TOPO.nodes():
+                    if NETWORKX_TOPO.nodes[node]['type'] == 'core':
+                        node_id = NETWORKX_TOPO.nodes[node]['node_id']
+                        hex_node = hex_node_id(node_id)
+                        linha = f"set_crc16_parameters calc {hex_node} 0x0 0x0 false false"
+                        
+                        filename = f'{node}-commands.txt'
+                        complete_path = os.path.join(pasta, filename)
+                        with open(complete_path, 'w') as arquivo:
+                            arquivo.write(linha)
+
+
             elif action == 3:
                 print("Emptying all tables...")
 
@@ -193,9 +207,14 @@ if __name__ == "__main__":
                     os.makedirs(pasta)
 
                 for node in NETWORKX_TOPO.nodes():
-                    node_number = get_node_number(node)
                     if NETWORKX_TOPO.nodes[node]['type'] == 'leaf':
-                        filename = f'e{node_number}-commands.txt'
+                        filename = f'{node}-commands.txt'
+                        complete_path = os.path.join(pasta, filename)
+                        with open(complete_path, 'w'):
+                            pass
+                for node in NETWORKX_TOPO.nodes():
+                    if NETWORKX_TOPO.nodes[node]['type'] == 'core':
+                        filename = f'{node}-commands.txt'
                         complete_path = os.path.join(pasta, filename)
                         with open(complete_path, 'w'):
                             pass
