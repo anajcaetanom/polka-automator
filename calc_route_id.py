@@ -3,6 +3,7 @@ import os
 import subprocess
 
 from load_topology import *
+from run_topology import run_net
 from aux import *
 
 from polka.tools import calculate_routeid, print_poly, shifting
@@ -36,7 +37,9 @@ if __name__ == "__main__":
     insertNodeID()
     print("\nStarting mininet...")
     MN_NET = loadMininet(NETWORKX_TOPO)
+    #run_net(MN_NET)
     MN_NET.start()
+    #CLI(MN_NET)
 
     while True:
         try:
@@ -62,8 +65,9 @@ if __name__ == "__main__":
                 print(f"\nFound {len(all_paths)} paths between {source} and {target}:\n")
 
                 ############### IDA ###############
-                print('\n####### IDA #######\n')
                 chosen_path = menu2(all_paths)
+
+                print('\n####### IDA #######\n')
                 print(f'Path: {chosen_path}')
                 path_node_ids = get_node_ids(NETWORKX_TOPO, chosen_path)
                 port_ids = decimal_to_binary(get_output_ports(chosen_path, MN_NET, NETWORKX_TOPO))
@@ -149,33 +153,48 @@ if __name__ == "__main__":
                         source = hosts[i].name
                         target = hosts[j].name
 
+                        print(f"Source: {source}")
+                        print(f"Target: {target}")
+
                         all_paths = get_all_paths_between_hosts(NETWORKX_TOPO, source, target)
+
+                        if source == target:
+                            path = []
+                            path.append(source)
+                            leaf = get_leaf(NETWORKX_TOPO, source)
+                            path.append(leaf)
+                            path.append(target)
+                            all_paths.append(path)
+
                         if not all_paths:
-                            break
+                            continue
 
                         for path in all_paths:
                             chosen_path = path
+                            print(chosen_path)
 
                             # --- IDA ---
-                            path_node_ids = get_node_ids(NETWORKX_TOPO, chosen_path)
-                            port_ids = decimal_to_binary(get_output_ports(chosen_path, MN_NET, NETWORKX_TOPO))
-                            routeID = calculate_routeid(path_node_ids, port_ids, debug=DEBUG)
-                            target_ip = MN_NET.get(target).IP()
-                            output_port = get_leaf_to_core_port_from_path(MN_NET, chosen_path, NETWORKX_TOPO)
-                            target_mac = MN_NET.get(target).MAC()
-                            
-                            if i == j:
+                            if connected_to_same_leaf(NETWORKX_TOPO, source, target):
                                 routeID_int = 0
+                                output_port = get_output_port(MN_NET, chosen_path[1], target)
                             else:
+                                path_node_ids = get_node_ids(NETWORKX_TOPO, chosen_path)
+                                port_ids = decimal_to_binary(get_output_ports(chosen_path, MN_NET, NETWORKX_TOPO))
+                                routeID = calculate_routeid(path_node_ids, port_ids, debug=DEBUG)
                                 routeID_int = shifting(routeID)
+                                output_port = get_leaf_to_core_port_from_path(MN_NET, chosen_path, NETWORKX_TOPO)
+
+                            target_ip = MN_NET.get(target).IP()
+                            target_mac = MN_NET.get(target).MAC()
 
                             linha = f"table_add tunnel_encap_process_sr add_sourcerouting_header {target_ip}/32 => {output_port} {target_mac} {routeID_int}"
 
-                            second_node = chosen_path[1]
-                            if NETWORKX_TOPO.nodes[second_node].get('type') == 'leaf':
-                                node_number = get_node_number(second_node)
-                            filename = f'e{node_number}-commands.txt'
-                            complete_path = os.path.join(pasta, filename)
+                            if chosen_path[1]:
+                                second_node = chosen_path[1]
+                                if NETWORKX_TOPO.nodes[second_node].get('type') == 'leaf':
+                                    filename = f'{second_node}-commands.txt'
+                                    complete_path = os.path.join(pasta, filename)
+                        
                             first_line = "table_set_default tunnel_encap_process_sr tdrop"
                             if not contains_line(complete_path, first_line):
                                 with open(complete_path, 'a') as arquivo:  # 'a' = append
@@ -186,44 +205,6 @@ if __name__ == "__main__":
                                 limpar_e_ordenar_arquivo(complete_path)
                             else:
                                 print("Table already contains that line.")
-                            
-                            ############### VOLTA ###############
-                            #print('\n####### VOLTA #######\n')
-                            path_volta = chosen_path[::-1] # ?só inverti o caminho escolhido?
-                            #print(f'Path: {path_volta}')
-                            path_node_ids = get_node_ids(NETWORKX_TOPO, path_volta)
-                            port_ids = decimal_to_binary(get_output_ports(path_volta, MN_NET, NETWORKX_TOPO))
-                            #print(f'Transmission state: {get_output_ports(path_volta, MN_NET, NETWORKX_TOPO)}')
-                            routeID = calculate_routeid(path_node_ids, port_ids, debug=DEBUG)
-                            target_ip = MN_NET.get(source).IP()
-                            #print(f"Target IP: {target_ip}")
-                            output_port = get_leaf_to_core_port_from_path(MN_NET, path_volta, NETWORKX_TOPO)
-                            #print(f"Output Port: {output_port}")
-                            target_mac = MN_NET.get(source).MAC()
-                            #print(f"Target MAC: {target_mac}")
-                        if i == j:
-                            routeID_int = 0
-                        else:
-                            routeID_int = shifting(routeID)
-
-                        linha = f"table_add tunnel_encap_process_sr add_sourcerouting_header {target_ip}/32 => {output_port} {target_mac} {routeID_int}"
-
-                        second_node = chosen_path[1]
-                        if NETWORKX_TOPO.nodes[second_node].get('type') == 'leaf':
-                            node_number = get_node_number(second_node)
-                        filename = f'e{node_number}-commands.txt'
-                        complete_path = os.path.join(pasta, filename)
-                        first_line = "table_set_default tunnel_encap_process_sr tdrop"
-                        if not contains_line(complete_path, first_line):
-                            with open(complete_path, 'a') as arquivo:  # 'a' = append
-                                arquivo.write(first_line)
-                        if not contains_line(complete_path, linha):
-                            with open(complete_path, 'a') as arquivo:
-                                arquivo.write('\n' + linha)
-                            limpar_e_ordenar_arquivo(complete_path)
-                        else:
-                            print("Table already contains that line.")
-
 
                         print('\nInfos adicionadas na tabela.\n')
 

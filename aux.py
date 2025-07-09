@@ -27,11 +27,37 @@ def get_connected_edge_number(topology, node):
             
     return None
 
+def get_leaf_nodes(net, topology, host_name):
+    host = net.get(host_name)
+    try:
+        leafs = []
+        for intf in host.intfList():
+            if intf.link:
+                node = (intf.link.intf1 if intf.link.intf2 == intf else intf.link.intf2).node
+                if topology.nodes[node]['type'] == 'leaf':
+                    leafs.append(node)
+        return leafs
+    except Exception as e:
+        print(f"[Erro] ao buscar leafs: {e}")
+        return []
+
+def connected_to_same_leaf(topology, host1, host2):
+    leaf1 = get_leaf(topology, host1)
+    leaf2 = get_leaf(topology, host2)
+
+    return leaf1 is not None and leaf1 == leaf2
+
+def get_leaf(topology, host):
+    vizinhos = list(topology.neighbors(host))
+    for vizinho in vizinhos:
+        if topology.nodes[vizinho].get("type") == "leaf":
+            return vizinho
+    return None
+
 def get_all_paths_between_hosts(topology, host1, host2):
     try:
         # all_simple_paths(): todos os caminhos onde cada nó aparece no máximo uma vez.
-        all_paths = list(networkx.all_simple_paths(topology, source=host1, target=host2))
-
+        all_paths = list(networkx.all_simple_paths(topology, host1, host2))
         if not all_paths:
             print("No paths found between the hosts.")
             return []
@@ -104,19 +130,42 @@ def menu2(all_paths):
         except ValueError:
             print("Invalid input. Please enter a number.")
 
-def get_output_port(net, src, dst):
+def get_output_port(net, src, dst, debug=False):
     """
-    Returns the output port number of the node 'src' towards the node 'dst'.
+    Retorna o número da porta no nó 'src' conectada ao nó 'dst',
+    baseada no nome da interface e no nome do nó do outro lado.
     """
     try:
-        # output interface from src to dst
-        intf = net.get(src).connectionsTo(net.get(dst))[0][0]
-        # port number (e.g., s1-eth1 → 1)
-        return int(intf.name.split('-')[-1].replace('eth', ''))
-    except IndexError:
-        raise Exception(f"No connection found between {src} and {dst}.")
+        src_node = net.get(src)
+        dst_node = net.get(dst)
+
+        for intf in src_node.intfList():
+            if not intf.link:
+                continue  # ignora interfaces sem link
+
+            # Tenta acessar o peer da interface por meio da outra ponta
+            link = intf.link
+            try:
+                peer_intf = link.intf1 if link.intf1.node != src_node else link.intf2
+            except Exception as e:
+                if debug:
+                    print(f"[DEBUG] Falha ao acessar peer de {intf.name}: {e}")
+                continue
+
+            if peer_intf.node == dst_node:
+                if debug:
+                    print(f"[DEBUG] Interface {intf.name} conecta {src} -> {dst}")
+                if intf.name and 'eth' in intf.name:
+                    return int(intf.name.split('eth')[-1])
+                else:
+                    return src_node.intfList().index(intf)
+
+        raise Exception(f"{src} não está diretamente conectado a {dst}")
+
     except Exception as e:
-        raise Exception(f"Error getting port from {src} to {dst}: {e}")
+        raise Exception(f"Erro ao obter porta de {src} para {dst}: {e}")
+
+
 
 def get_output_ports(path, net, nx_topo):
     """
@@ -166,14 +215,7 @@ def get_leaf_to_core_port_from_path(net, path, topo_nx):
         next_node = path[i + 1]
 
         if topo_nx.nodes[curr_node].get("type") == "leaf" and topo_nx.nodes[next_node].get("type") == "core":
-            leaf = net.get(curr_node)
-            core = net.get(next_node)
-
-            links = leaf.connectionsTo(core)
-            for intf1, intf2 in links:
-                if intf1.node == leaf:
-                    port_number = leaf.ports[intf1]
-                    return port_number
+            return get_output_port(net, curr_node, next_node)
 
     print("No leaf-to-core hop found in the path.")
     return None
