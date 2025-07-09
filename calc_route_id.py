@@ -3,10 +3,9 @@ import os
 import subprocess
 
 from load_topology import *
-from run_topology import run_net
 from aux import *
 
-from polka.tools import calculate_routeid, print_poly, shifting
+from polka.tools import calculate_routeid, shifting
 
 DEBUG = False
 
@@ -67,20 +66,13 @@ if __name__ == "__main__":
                 ############### IDA ###############
                 chosen_path = menu2(all_paths)
 
-                print('\n####### IDA #######\n')
-                print(f'Path: {chosen_path}')
                 path_node_ids = get_node_ids(NETWORKX_TOPO, chosen_path)
                 port_ids = decimal_to_binary(get_output_ports_list(chosen_path, MN_NET, NETWORKX_TOPO))
-                print(f'Transmission state: {get_output_ports_list(chosen_path, MN_NET, NETWORKX_TOPO)}')
                 routeID = calculate_routeid(path_node_ids, port_ids, debug=DEBUG)
                 target_ip = MN_NET.get(target).IP() 
-                print(f"Target IP: {target_ip}")
                 output_port = get_leaf_to_core_port_from_path(MN_NET, chosen_path, NETWORKX_TOPO)
-                print(f"Output Port: {output_port}")
                 target_mac = MN_NET.get(target).MAC()
-                print(f"Target MAC: {target_mac}")
                 routeID_int = shifting(routeID)
-                print(f"RouteID (int): {routeID_int}")
 
                 linha = f"table_add tunnel_encap_process_sr add_sourcerouting_header {target_ip}/32 => {output_port} {target_mac} {routeID_int}"
 
@@ -97,25 +89,19 @@ if __name__ == "__main__":
                     with open(complete_path, 'a') as arquivo:  
                         arquivo.write('\n' + linha)
                     clean_and_sort_file(complete_path)
+                    print('\nInfos adicionadas na tabela.')
                 else:
                     print("Table already contains that line.")
                 
                 ############### VOLTA ###############
-                print('\n####### VOLTA #######\n')
                 path_volta = chosen_path[::-1] # ?só inverti o caminho escolhido?
-                print(f'Path: {path_volta}')
                 path_node_ids = get_node_ids(NETWORKX_TOPO, path_volta)
                 port_ids = decimal_to_binary(get_output_ports_list(path_volta, MN_NET, NETWORKX_TOPO))
-                print(f'Transmission state: {get_output_ports_list(path_volta, MN_NET, NETWORKX_TOPO)}')
                 routeID = calculate_routeid(path_node_ids, port_ids, debug=DEBUG)
                 target_ip = MN_NET.get(source).IP()
-                print(f"Target IP: {target_ip}")
                 output_port = get_leaf_to_core_port_from_path(MN_NET, path_volta, NETWORKX_TOPO)
-                print(f"Output Port: {output_port}")
                 target_mac = MN_NET.get(source).MAC()
-                print(f"Target MAC: {target_mac}")
                 routeID_int = shifting(routeID)
-                print(f"RouteID (int): {routeID_int}")
 
                 linha = f"table_add tunnel_encap_process_sr add_sourcerouting_header {target_ip}/32 => {output_port} {target_mac} {routeID_int}"
 
@@ -132,11 +118,9 @@ if __name__ == "__main__":
                     with open(complete_path, 'a') as arquivo:
                         arquivo.write('\n' + linha)
                     clean_and_sort_file(complete_path)
+                    print('\nInfos adicionadas na tabela.')
                 else:
                     print("Table already contains that line.")
-
-
-                print('\nInfos adicionadas na tabela.')
 
             elif action == 2:
                 print("\nGenerating IDs for all paths...\n")
@@ -149,12 +133,8 @@ if __name__ == "__main__":
 
                 for i in range(len(hosts)):
                     for j in range(len(hosts)):
-                    
                         source = hosts[i].name
                         target = hosts[j].name
-
-                        print(f"Source: {source}")
-                        print(f"Target: {target}")
 
                         all_paths = get_all_paths_between_hosts(NETWORKX_TOPO, source, target)
 
@@ -171,9 +151,7 @@ if __name__ == "__main__":
 
                         for path in all_paths:
                             chosen_path = path
-                            print(chosen_path)
 
-                            # --- IDA ---
                             if connected_to_same_leaf(NETWORKX_TOPO, source, target):
                                 routeID_int = 0
                                 output_port = get_output_port(MN_NET, chosen_path[1], target)
@@ -203,10 +181,9 @@ if __name__ == "__main__":
                                 with open(complete_path, 'a') as arquivo:  
                                     arquivo.write('\n' + linha)
                                 clean_and_sort_file(complete_path)
+                                print('\nInfos adicionadas na tabela.')
                             else:
                                 print("Table already contains that line.")
-
-                        print('\nInfos adicionadas na tabela.\n')
 
             elif action == 3:
                 print("Emptying all tables...")
@@ -223,7 +200,7 @@ if __name__ == "__main__":
                         with open(complete_path, 'w'):
                             pass
 
-                print('\nTables emptied.\n')
+                print('\nTables emptied.')
                         
 
         except Exception as e:
