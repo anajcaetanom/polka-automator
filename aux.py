@@ -288,15 +288,16 @@ def menu1():
             print("\nMenu:")
             print("1. Choose a single path.")
             print("2. Generate route-ID for all paths.")
-            print("3. Empty all edge tables.")
+            print("3. Empty all tables.")
+            print("4. Open Mininet CLI.")
             print("0. Exit.")
 
             action = input("\nSelect an option: ").strip()
 
-            if action in ('0', '1', '2', '3'):
+            if action in ('0', '1', '2', '3', '4'):
                 return int(action)
             else:
-                print("Invalid option. Please enter 0, 1, 2 or 3.")
+                print("Invalid option. Please try again.")
         except Exception as e:
             print(f"[Error] in menu1: {e}")
 

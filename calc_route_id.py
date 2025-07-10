@@ -2,9 +2,12 @@
 import os
 import subprocess
 
-from load_topology import *
+from load_topology import loadNXtopology, loadMininet
+from run_topology import run_net
 from aux import *
 
+from mininet.log import setLogLevel
+from mn_wifi.cli import CLI
 from polka.tools import calculate_routeid, shifting
 
 DEBUG = False
@@ -33,11 +36,11 @@ def insertNodeID():
 if __name__ == "__main__":
 
     insertNodeID()
+
     print("\nStarting mininet...")
+    setLogLevel("info")
     MN_NET = loadMininet(NETWORKX_TOPO)
-    #run_net(MN_NET)
-    MN_NET.start()
-    #CLI(MN_NET)
+    run_net(MN_NET)
 
     while True:
         try:
@@ -65,6 +68,19 @@ if __name__ == "__main__":
                 ############### IDA ###############
                 chosen_path = menu2(all_paths)
 
+                ################ core nodes ################
+                for node in chosen_path:
+                    if NETWORKX_TOPO.nodes[node]['type'] == 'core':
+                        node_id = NETWORKX_TOPO.nodes[node]['node_id']
+                        hex_node = hex_node_id(node_id)
+                        linha = f"set_crc16_parameters calc {hex_node} 0x0 0x0 false false"
+                        filename = f'{node}-commands.txt'
+                        complete_path = os.path.join(pasta, filename)
+                        if not contains_line(complete_path, linha):
+                            with open(complete_path, 'w') as arquivo:
+                                arquivo.write(linha)
+                
+                ################# edge nodes #################  
                 path_node_ids = get_node_ids(NETWORKX_TOPO, chosen_path)
                 port_ids = decimal_to_binary(get_output_ports_list(chosen_path, MN_NET, NETWORKX_TOPO))
                 routeID = calculate_routeid(path_node_ids, port_ids, debug=DEBUG)
@@ -126,7 +142,6 @@ if __name__ == "__main__":
                 pasta = os.path.join(os.getcwd(), "polka", "config")
                 if not os.path.exists(pasta):
                     os.makedirs(pasta)
-
 
                 ################# edge nodes #################
                 hosts = MN_NET.hosts
@@ -192,12 +207,11 @@ if __name__ == "__main__":
                         node_id = NETWORKX_TOPO.nodes[node]['node_id']
                         hex_node = hex_node_id(node_id)
                         linha = f"set_crc16_parameters calc {hex_node} 0x0 0x0 false false"
-                        
                         filename = f'{node}-commands.txt'
                         complete_path = os.path.join(pasta, filename)
-                        with open(complete_path, 'w') as arquivo:
-                            arquivo.write(linha)
-
+                        if not contains_line(complete_path, linha):
+                            with open(complete_path, 'w') as arquivo:
+                                arquivo.write(linha)
 
             elif action == 3:
                 print("Emptying all tables...")
@@ -218,9 +232,10 @@ if __name__ == "__main__":
                         complete_path = os.path.join(pasta, filename)
                         with open(complete_path, 'w'):
                             pass
-
                 print('\nTables emptied.')
-                        
+            
+            elif action == 4:
+                CLI(MN_NET)
 
         except Exception as e:
             print(f"Error: {e}")
