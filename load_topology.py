@@ -6,11 +6,11 @@ from mn_wifi.bmv2 import P4Switch
 
 from aux import *
 
-def loadNXtopology():
+def loadNXtopology(file):
     """
     Load a topology from a GML file.
     """
-    file = 'topology.gml'
+    #file = 'topology.gml'
     topology = networkx.read_gml(file, label='label')
     return topology
 

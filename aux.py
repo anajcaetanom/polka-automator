@@ -1,6 +1,7 @@
 #!/home/p4/src/p4dev-python-venv/bin/python
 
 import re
+import os
 import networkx
 import ipaddress
 import matplotlib.pyplot as plt
@@ -65,6 +66,98 @@ def clean_and_sort_file(caminho_arquivo):
     
     except Exception as e:
         print(f"[Error] while cleaning and sorting file: {e}")
+
+##################################################
+#                USER INTERFACE                 
+##################################################
+
+def get_host(prompt):
+    """
+    Get a valid host input from the user.
+    """
+    while True:
+        try:
+            host = input(prompt).strip().lower()
+            if re.fullmatch(r"h\d+", host):
+                return host
+            else:
+                print("Invalid input. Please type a valid host like 'h1', 'h2', ...")
+        except Exception as e:
+            print(f"[Error] while reading input: {e}")
+
+def menu1():
+    """
+    Main menu selection.
+    """
+    while True:
+        try:
+            print("\nMenu:")
+            print("1. Choose a single path.")
+            print("2. Generate route-ID for all paths.")
+            print("3. Empty all tables.")
+            print("4. Open Mininet CLI.")
+            print("0. Exit.")
+
+            action = input("\nSelect an option: ").strip()
+
+            if action in ('0', '1', '2', '3', '4'):
+                return int(action)
+            else:
+                print("Invalid option. Please try again.")
+        except Exception as e:
+            print(f"[Error] in menu1: {e}")
+
+def menu2(all_paths):
+    """
+    Allow user to select one of the listed paths.
+    """
+    try:
+        for i, path in enumerate(all_paths, 1):
+            print(f"Path {i}: {' -> '.join(path)}")
+        
+        while True:
+            try:
+                option = int(input("\nType the number of a path to choose, or 0 to quit: "))
+                if (option == 0):
+                    print("Exiting...")
+                    break
+                elif (1 <= option <= len(all_paths)):
+                    chosen_path = all_paths[option - 1]
+                    print(f"You chose path {option}.\n")
+                    return chosen_path
+                else:
+                    print("Invalid option. Please try again.")
+            except ValueError:
+                print("Invalid input. Please enter a number.")
+    except Exception as e:
+        print(f"[Error] in menu2: {e}")
+        return None
+    
+def choose_topo_menu(pasta="topologies"):
+    if not os.path.isdir(pasta):
+        print(f"Directory does not exist.")
+        return None
+
+    arquivos = [file for file in os.listdir(pasta) if file.endswith(".gml")]
+    if not arquivos:
+        print(f"No .gml files available in directory.")
+        return None
+    
+    print(f"Available topologies:")
+    for i, file in enumerate(arquivos, start=1):
+        print(f"{i}. {file}")
+
+    while True:
+        try:
+            option = int(input(f"\nType the number of a topology option: "))
+            if len(arquivos) >= option >= 1:
+                selected = arquivos[option - 1]
+                print(f"\nTopology selected: {selected}")
+                return selected
+            else: 
+                print(f"Invalid option. Try again.")
+        except ValueError:
+            print("Invalid entry. Type a number.")
 
 ##################################################
 #              NETWORK TOPOLOGY                 
@@ -261,71 +354,6 @@ def decimal_to_binary(output_ports_list):
         print(f"[Error] while converting ports to binary: {e}")
         return []
 
-##################################################
-#                USER INTERFACE                 
-##################################################
-
-def get_host(prompt):
-    """
-    Get a valid host input from the user.
-    """
-    while True:
-        try:
-            host = input(prompt).strip().lower()
-            if re.fullmatch(r"h\d+", host):
-                return host
-            else:
-                print("Invalid input. Please type a valid host like 'h1', 'h2', ...")
-        except Exception as e:
-            print(f"[Error] while reading input: {e}")
-
-def menu1():
-    """
-    Main menu selection.
-    """
-    while True:
-        try:
-            print("\nMenu:")
-            print("1. Choose a single path.")
-            print("2. Generate route-ID for all paths.")
-            print("3. Empty all tables.")
-            print("4. Open Mininet CLI.")
-            print("0. Exit.")
-
-            action = input("\nSelect an option: ").strip()
-
-            if action in ('0', '1', '2', '3', '4'):
-                return int(action)
-            else:
-                print("Invalid option. Please try again.")
-        except Exception as e:
-            print(f"[Error] in menu1: {e}")
-
-def menu2(all_paths):
-    """
-    Allow user to select one of the listed paths.
-    """
-    try:
-        for i, path in enumerate(all_paths, 1):
-            print(f"Path {i}: {' -> '.join(path)}")
-        
-        while True:
-            try:
-                option = int(input("\nType the number of a path to choose, or 0 to quit: "))
-                if (option == 0):
-                    print("Exiting...")
-                    break
-                elif (1 <= option <= len(all_paths)):
-                    chosen_path = all_paths[option - 1]
-                    print(f"You chose path {option}.\n")
-                    return chosen_path
-                else:
-                    print("Invalid option. Please try again.")
-            except ValueError:
-                print("Invalid input. Please enter a number.")
-    except Exception as e:
-        print(f"[Error] in menu2: {e}")
-        return None
 
 ##################################################
 #               DEBUG / TEST                 

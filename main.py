@@ -12,8 +12,6 @@ from polka.tools import calculate_routeid, shifting
 
 DEBUG = False
 
-NETWORKX_TOPO = loadNXtopology()
-
 def insertNodeID():
     # nodeID: an identifier previously assigned to core nodes 
     #         by the controller in a network configuration phase
@@ -34,6 +32,10 @@ def insertNodeID():
     attribute_node_ids(NETWORKX_TOPO, irred_polys)
 
 if __name__ == "__main__":
+
+    topo = choose_topo_menu() 
+    NETWORKX_TOPO = loadNXtopology(topo)
+    show_nx_topo(NETWORKX_TOPO)
 
     insertNodeID()
 
