@@ -4,7 +4,10 @@ import subprocess
 
 from load_topology import loadNXtopology, loadMininet
 from run_topology import run_net
-from aux import *
+from utils.user_interface import *
+from utils.network_utils import *
+from utils.file_utils import *
+from utils.test_utils import show_nx_topo
 
 from mininet.log import setLogLevel
 from mn_wifi.cli import CLI
