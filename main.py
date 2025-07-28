@@ -15,32 +15,13 @@ from polka.tools import calculate_routeid, shifting
 
 DEBUG = False
 
-def insertNodeID():
-    # nodeID: an identifier previously assigned to core nodes 
-    #         by the controller in a network configuration phase
-    irred_polys = [
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 1], 
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1], 
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1], 
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1], 
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1], 
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 1], 
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1], 
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1], 
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1, 1, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 1, 0, 1], 
-    ]
-
-    print("\nInsering irred poly (node-ID)...")
-    attribute_node_ids(NETWORKX_TOPO, irred_polys)
-
 if __name__ == "__main__":
 
     topo = choose_topo_menu() 
     NETWORKX_TOPO = loadNXtopology(topo)
     show_nx_topo(NETWORKX_TOPO)
 
-    insertNodeID()
+    attribute_node_ids(NETWORKX_TOPO, "polynomials.txt")
 
     print("\nStarting mininet...")
     setLogLevel("info")

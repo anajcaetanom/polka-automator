@@ -51,12 +51,12 @@ graph [
     edge [ source 6 target 16 ]
     edge [ source 16 target 26 ]
 
-    # conexões entre nós de core
+    # core nodes interconections
     edge [ source 21 target 22 ]
     edge [ source 22 target 23 ]
     edge [ source 24 target 25 ]
     edge [ source 25 target 26 ]
     edge [ source 21 target 24 ]
-    edge [ source 21 target 24 ]
+    edge [ source 22 target 25 ]
     edge [ source 23 target 26 ]
 ]

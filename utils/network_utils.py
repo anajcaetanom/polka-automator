@@ -1,4 +1,7 @@
 import networkx
+import csv
+import sys
+import ast
 
 def get_node_number(node):
     """
@@ -9,6 +12,7 @@ def get_node_number(node):
     except (ValueError, IndexError) as e:
         print(f"[Error] Failed to parse node number from '{node}': {e}")
         return -1
+    
 
 def hex_node_id(node_id):
     """
@@ -28,6 +32,7 @@ def hex_node_id(node_id):
     except Exception as e:
         print(f"[Error] while converting node_id to hex: {e}")
 
+
 def decimal_to_binary(output_ports_list):
     """
     Convert decimal output ports to binary representation.
@@ -42,11 +47,22 @@ def decimal_to_binary(output_ports_list):
     except Exception as e:
         print(f"[Error] while converting ports to binary: {e}")
         return []
+    
 
-def attribute_node_ids(topology, irred_polys):
+def attribute_node_ids(topology, poly_file):
     """
     Attribute irreducible polynomials to core nodes.
     """
+    num_core_nodes = sum(1 for n in topology.nodes() if topology.nodes[n].get('type') == 'core')
+
+    irred_polys = []
+    with open(poly_file, 'r', encoding='utf-8') as f:
+        for i in range(num_core_nodes):
+            line = f.readline()
+            if not line:
+                break
+            irred_polys.append(ast.literal_eval(line.strip()))
+
     try:
         i = 0
         for node in topology.nodes():
@@ -57,6 +73,25 @@ def attribute_node_ids(topology, irred_polys):
         print("[Error] Not enough irreducible polynomials for all core nodes.")
     except Exception as e:
         print(f"[Error] while assigning node_ids: {e}")
+
+
+def get_node_ids(topology, chosen_path):
+    """
+    Get the node IDs of core nodes in the chosen path.
+    """
+    try:
+        node_list = []
+        for node in chosen_path:
+            if topology.nodes[node].get('type') == 'core':
+                node_id = topology.nodes[node].get('node_id')
+                node_list.append(node_id)
+        return node_list
+    except KeyError as e:
+        print(f"[Error] node_id not found in topology: {e}")
+    except Exception as e:
+        print(f"[Error] while retrieving node_ids: {e}")
+    return []
+
 
 def get_connected_edge_number(topology, node):
     """
@@ -72,6 +107,7 @@ def get_connected_edge_number(topology, node):
         print(f"[Error] while getting connected leaf: {e}")
     return None
 
+
 def connected_to_same_leaf(topology, host1, host2):
     """
     Check whether two hosts are connected to the same leaf.
@@ -81,6 +117,7 @@ def connected_to_same_leaf(topology, host1, host2):
     except Exception as e:
         print(f"[Error] checking if {host1} and {host2} are on the same leaf: {e}")
         return False
+    
 
 def get_leaf(topology, host):
     """
@@ -94,6 +131,7 @@ def get_leaf(topology, host):
     except Exception as e:
         print(f"[Error] while searching leaf of {host}: {e}")
     return None
+
 
 def get_all_paths_between_hosts(topology, host1, host2):
     """
@@ -114,6 +152,7 @@ def get_all_paths_between_hosts(topology, host1, host2):
     except Exception as e:
         print(f"[Error] while retrieving paths: {e}")
     return []
+
 
 def get_output_port(net, src, dst, debug=False):
     """
@@ -147,6 +186,7 @@ def get_output_port(net, src, dst, debug=False):
     except Exception as e:
         print(f"[Error] while getting output port from {src} to {dst}: {e}")
         return None
+    
 
 def get_output_ports_list(path, net, nx_topo):
     """
@@ -166,22 +206,6 @@ def get_output_ports_list(path, net, nx_topo):
         print(f"[Error] while getting output ports: {e}")
         return []
 
-def get_node_ids(topology, chosen_path):
-    """
-    Get the node IDs of core nodes in the chosen path.
-    """
-    try:
-        node_list = []
-        for node in chosen_path:
-            if topology.nodes[node].get('type') == 'core':
-                node_id = topology.nodes[node].get('node_id')
-                node_list.append(node_id)
-        return node_list
-    except KeyError as e:
-        print(f"[Error] node_id not found in topology: {e}")
-    except Exception as e:
-        print(f"[Error] while retrieving node_ids: {e}")
-    return []
 
 def get_leaf_to_core_port_from_path(net, path, topo_nx):
     """
@@ -199,3 +223,41 @@ def get_leaf_to_core_port_from_path(net, path, topo_nx):
         print(f"[Error] while finding leaf-to-core port: {e}")
     print("No leaf-to-core hop found in the path.")
     return None
+
+
+def extract_polys_from_csv(file_path):
+    csv.field_size_limit(sys.maxsize)
+    
+    with open(file_path, newline='') as file:
+        reader = csv.reader(file, delimiter=';')
+        lines = list(reader)
+
+        if not lines:
+            print("[ERROR] Empty CSV file.")
+            return []
+        
+        last_line = lines[-1]
+        poly_column = ''.join(last_line[2:]).strip()
+
+        with open('polynomials.txt', 'w', encoding='utf-8') as out:
+
+            if poly_column.startswith('[['):
+                poly_column = poly_column[1:]  # agora começa com [
+
+            buffer = ''
+            abertos = 0
+
+            for c in poly_column:
+                buffer += c
+                if c == '[':
+                    abertos += 1
+                elif c == ']':
+                    abertos -= 1
+                    if abertos == 0:
+                        out.write(buffer.strip().lstrip(', ') + '\n')
+                        buffer = ''
+
+    print("Polynomials extracted from CSV.")
+
+if __name__ == '__main__':
+    extract_polys_from_csv('csv/irr_poly_table1_16.csv')

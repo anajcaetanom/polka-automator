@@ -76,7 +76,7 @@ def choose_topo_menu(pasta="topologies"):
         print(f"No .gml files available in directory.")
         return None
     
-    print(f"Available topologies:")
+    print(f"\nAvailable topologies:")
     for i, file in enumerate(arquivos, start=1):
         print(f"{i}. {file}")
 
@@ -86,7 +86,8 @@ def choose_topo_menu(pasta="topologies"):
             if len(arquivos) >= option >= 1:
                 selected = arquivos[option - 1]
                 print(f"\nTopology selected: {selected}")
-                return selected
+                topo = os.path.join(pasta, selected)
+                return topo
             else: 
                 print(f"Invalid option. Try again.")
         except ValueError:
