@@ -14,33 +14,33 @@ The main goal of this project is to simplify the manipulation of network topolog
 
     Available at: [Ubuntu website](https://releases.ubuntu.com/20.04.6/?_ga=2.149898549.2084151835.1707729318-1126754318.1683186906)
 
-2. Use VirtualBox or VMware to create the VM.
+1. Use VirtualBox or VMware to create the VM.
 
 ### Installing PolKA dependencies
 
-1. Update the OS:
+1. Update the system:
     ```bash
     $ sudo apt update && sudo apt dist-upgrade -y
     ```
-2. Clean installation files:
+1. Clean up unnecessary packages and cache:
     ```bash
     $ sudo apt clean && sudo apt autoremove -y
     ```
-3. Reboot the OS:
+1. Reboot:
     ```bash
     $ sudo reboot
     ```
-4. Install Mininet:
+1. Install Mininet:
     ```bash
     $ sudo apt install mininet
     ```
-5. Install Mininet Wifi:
+1. Install Mininet Wifi:
     ```bash
     $ git clone https://github.com/intrig-unicamp/mininet-wifi
     $ cd mininet-wifi
     $ sudo util/install.sh -Wlnfv
     ```
-6. Install P4C (P4 language compiler):
+1. Install P4C (the P4 language compiler):
     ```bash
     $ source /etc/lsb-release
     $ sudo apt install curl
@@ -54,14 +54,14 @@ The main goal of this project is to simplify the manipulation of network topolog
     $ sudo apt-get update
     $ sudo apt install p4lang-p4c
     ```
-7. Install PolKA:
+1. Install PolKA:
     ```bash
     $ pip install polka-routing
     ```
 
 ### Installing code dependencies
 
-1. Install code requiriments:
+1. Install code requirements:
     ```bash
     $ pip install -r requirements.txt
     ```
@@ -81,7 +81,7 @@ The main goal of this project is to simplify the manipulation of network topolog
     $ sudo -E python3 calc_route_id.py
     ```
 
-2. Follow the terminal prompts to interact.
+1. Follow the terminal prompts to interact.
     
 
 ## 🚀 Features (in progress)
