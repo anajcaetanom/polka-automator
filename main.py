@@ -1,12 +1,3 @@
-import logging
-logger = logging.getLogger('newfn')
-logger.setLevel(logging.CRITICAL + 1)  # nível acima do máximo
-logger.propagate = False  # impede de subir pro root
-logger.disabled = True    # desativa por completo
-for handler in logger.handlers[:]:
-    logger.removeHandler(handler)
-
-
 import os
 import subprocess
 
@@ -27,16 +18,12 @@ if __name__ == "__main__":
 
     topo = choose_topo_menu() 
     NETWORKX_TOPO = loadNXtopology(topo)
-    show_nx_topo(NETWORKX_TOPO)
 
     attribute_node_ids(NETWORKX_TOPO, "polynomials.txt")
 
     print("\nStarting mininet...")
-    setLogLevel("info")
     MN_NET = loadMininet(NETWORKX_TOPO)
     run_net(MN_NET)
-    logging.getLogger('newfn').setLevel(logging.WARNING)
-    logging.getLogger('newfn').handlers.clear()
 
     while True:
         try:
@@ -236,7 +223,6 @@ if __name__ == "__main__":
                 print('\nTables emptied.')
             
             elif action == 4:
-                logging.getLogger('newfn').setLevel(logging.WARNING)
                 CLI(MN_NET)
 
             elif action == 5:
