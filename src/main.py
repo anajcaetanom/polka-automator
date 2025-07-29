@@ -6,9 +6,7 @@ from run_topology import run_net
 from utils.user_interface import *
 from utils.network_utils import *
 from utils.file_utils import *
-from utils.test_utils import show_nx_topo
 
-from mininet.log import setLogLevel
 from mininet.cli import CLI
 from polka.tools import calculate_routeid, shifting
 
@@ -16,8 +14,12 @@ DEBUG = False
 
 if __name__ == "__main__":
 
-    topo = choose_topo_menu() 
-    NETWORKX_TOPO = loadNXtopology(topo)
+    current_file = os.path.abspath(__file__)
+    project_root = os.path.abspath(os.path.join(current_file, "..", ".."))
+
+    pasta_topo = os.path.join(project_root, "topologies")
+    selected_topo = choose_topo_menu(pasta_topo) 
+    NETWORKX_TOPO = loadNXtopology(selected_topo)
 
     attribute_node_ids(NETWORKX_TOPO, "polynomials.txt")
 
@@ -36,7 +38,7 @@ if __name__ == "__main__":
                 break
 
             elif action == 1:  
-                pasta = os.path.join(os.getcwd(), "polka", "config")
+                pasta = os.path.join(project_root, "polka", "config")
                 if not os.path.exists(pasta):
                     os.makedirs(pasta)
 
@@ -124,7 +126,7 @@ if __name__ == "__main__":
 
             elif action == 2:
                 print("\nGenerating IDs for all paths...\n")
-                pasta = os.path.join(os.getcwd(), "polka", "config")
+                pasta = os.path.join(project_root, "polka", "config")
                 if not os.path.exists(pasta):
                     os.makedirs(pasta)
 
@@ -204,7 +206,7 @@ if __name__ == "__main__":
             elif action == 3:
                 print("Emptying all tables...")
 
-                pasta = os.path.join(os.getcwd(), "polka", "config")
+                pasta = os.path.join(project_root, "polka", "config")
                 if not os.path.exists(pasta):
                     os.makedirs(pasta)
 

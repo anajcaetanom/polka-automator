@@ -1,6 +1,6 @@
 .venv
 /__pycache__
-utils/__pycache__
+src/utils/__pycache__
 polka/config
 polka/polka-edge.p4i
 polka/polka-core.p4i
