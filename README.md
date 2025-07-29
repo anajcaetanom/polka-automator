@@ -85,3 +85,11 @@ The main goal of this project is to simplify the manipulation of network topolog
     
 
 ## 🚀 Features (in progress)
+
+- GML Topology Parsing with NetworkX
+
+- Mininet Integration
+
+- Source Routing with PolKA (Polynomial Key-based Architecture)
+
+- Custom Topology Support
