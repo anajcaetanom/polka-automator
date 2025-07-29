@@ -8,7 +8,7 @@ from utils.network_utils import *
 
 def loadNXtopology(file):
     """
-    Load a topology from a GML file.
+    Loads a topology from a GML file.
     """
     #file = 'topology.gml'
     topology = networkx.read_gml(file, label='label')

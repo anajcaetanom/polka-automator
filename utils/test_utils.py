@@ -13,6 +13,9 @@ def print_nodes_by_type(topology):
         print()
 
 def show_nx_topo(topology):
+    """
+    Displays a NetworkX topology graph with node colors based on node type.
+    """
     pos = networkx.spring_layout(topology)
     color_map = []
     for node in topology:

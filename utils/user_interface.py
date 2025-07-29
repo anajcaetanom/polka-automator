@@ -5,7 +5,7 @@ from utils.test_utils import *
 
 def get_host(prompt):
     """
-    Get a valid host input from the user.
+    Gets a valid host input from the user.
     """
     while True:
         try:
@@ -42,7 +42,7 @@ def menu1():
 
 def menu2(all_paths):
     """
-    Allow user to select one of the listed paths.
+    Allows user to select one of the listed paths.
     """
     try:
         for i, path in enumerate(all_paths, 1):
@@ -68,7 +68,7 @@ def menu2(all_paths):
     
 def choose_topo_menu(pasta="topologies"):
     """
-    Allow user to choose a topology file.
+    Allows user to choose a topology file.
     """
     if not os.path.isdir(pasta):
         print(f"Directory does not exist.")
@@ -97,6 +97,9 @@ def choose_topo_menu(pasta="topologies"):
             print("Invalid entry. Type a number.")
 
 def debug_menu(nx_topo):
+    """
+    Displays an interactive debug menu for inspecting the NetworkX topology.
+    """
     while True:
         try:
             print("\n--- Debug Menu ---")

@@ -5,7 +5,7 @@ import ast
 
 def get_node_number(node):
     """
-    Get the number of a node based on its label.
+    Gets the number of a node based on its label.
     """
     try:
         return int(node[1:])
@@ -35,7 +35,7 @@ def hex_node_id(node_id):
 
 def decimal_to_binary(output_ports_list):
     """
-    Convert decimal output ports to binary representation.
+    Converts decimal output ports to binary representation.
     """
     try:
         binary_list = []
@@ -51,7 +51,7 @@ def decimal_to_binary(output_ports_list):
 
 def attribute_node_ids(topology, poly_file):
     """
-    Attribute irreducible polynomials to core nodes.
+    Attributes irreducible polynomials to core nodes.
     """
     num_core_nodes = sum(1 for n in topology.nodes() if topology.nodes[n].get('type') == 'core')
 
@@ -77,7 +77,7 @@ def attribute_node_ids(topology, poly_file):
 
 def get_node_ids(topology, chosen_path):
     """
-    Get the node IDs of core nodes in the chosen path.
+    Gets the node IDs of core nodes in the chosen path.
     """
     try:
         node_list = []
@@ -95,8 +95,7 @@ def get_node_ids(topology, chosen_path):
 
 def get_connected_edge_number(topology, node):
     """
-    Get the number of the edge node (leaf) connected to the given node.
-    Returns None if no edge node is found among neighbors.
+    Gets the number of the edge node (leaf) connected to the given node.
     """
     try: 
         neighbors = list(topology.neighbors(node))
@@ -110,7 +109,7 @@ def get_connected_edge_number(topology, node):
 
 def connected_to_same_leaf(topology, host1, host2):
     """
-    Check whether two hosts are connected to the same leaf.
+    Checks whether two hosts are connected to the same leaf.
     """
     try:
         return get_leaf(topology, host1) == get_leaf(topology, host2)
@@ -121,7 +120,7 @@ def connected_to_same_leaf(topology, host1, host2):
 
 def get_leaf(topology, host):
     """
-    Return the leaf node connected to the host.
+    Returns the leaf node connected to the host.
     """
     try:
         vizinhos = list(topology.neighbors(host))
@@ -135,7 +134,7 @@ def get_leaf(topology, host):
 
 def get_all_paths_between_hosts(topology, host1, host2):
     """
-    Return all simple paths between two hosts.
+    Returns all simple paths between two hosts.
     """
     try:
         # all_simple_paths(): todos os caminhos onde cada nó aparece no máximo uma vez.
@@ -156,7 +155,7 @@ def get_all_paths_between_hosts(topology, host1, host2):
 
 def get_output_port(net, src, dst, debug=False):
     """
-    Get the output port number on node 'src' connected to node 'dst'.
+    Gets the output port number on node 'src' connected to node 'dst'.
     """
     try:
         src_node = net.get(src)
@@ -190,7 +189,7 @@ def get_output_port(net, src, dst, debug=False):
 
 def get_output_ports_list(path, net, nx_topo):
     """
-    Get the output ports of the core nodes for a given path in the topology.
+    Gets the output ports of the core nodes for a given path in the topology.
     """
     try:
         output_ports = []
@@ -226,6 +225,9 @@ def get_leaf_to_core_port_from_path(net, path, topo_nx):
 
 
 def extract_polys_from_csv(file_path):
+    """
+    Extracts irreducible polynomials from a specific CSV file and writes them to 'polynomials.txt'.
+    """
     csv.field_size_limit(sys.maxsize)
     
     with open(file_path, newline='') as file:

@@ -1,6 +1,10 @@
 #!/usr/bin/python
 
 def run_net(net):
+    """
+    Starts the Mininet network, sets static ARP entries, disables rx/tx offloading on hosts,
+    and disables IPv6 on all hosts and switches.
+    """
     net.start()
     net.staticArp()
 

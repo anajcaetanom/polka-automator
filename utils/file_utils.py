@@ -2,7 +2,7 @@ import ipaddress
 
 def contains_line(filename, target_line):
     """
-    Check if a file contains a specific line.
+    Checks if a file contains a specific line.
     """
     try:
         with open(filename, 'r') as file:
@@ -16,7 +16,7 @@ def contains_line(filename, target_line):
 
 def clean_and_sort_file(caminho_arquivo):
     """
-    Remove empty lines and sort the remaining ones based on IP addresses.
+    Removes empty lines and sorts the remaining ones based on IP addresses.
     """
     try:
         with open(caminho_arquivo, 'r') as f:
