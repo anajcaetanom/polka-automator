@@ -3,11 +3,14 @@ import matplotlib.pyplot as plt
 
 def print_nodes_by_type(topology):
     """
-    Print nodes by type.
+    Print nodes and its attributes.
     """
     for node in topology.nodes():
-        node_type = topology.nodes[node]['type']
-        print(f"Node {node} is of type {node_type}")
+        attrs = topology.nodes[node]
+        print(f"Node {node}:")
+        for key, value in attrs.items():
+            print(f"  {key}: {value}")
+        print()
 
 def show_nx_topo(topology):
     pos = networkx.spring_layout(topology)

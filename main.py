@@ -1,4 +1,12 @@
-#!/home/p4/src/p4dev-python-venv/bin/python
+import logging
+logger = logging.getLogger('newfn')
+logger.setLevel(logging.CRITICAL + 1)  # nível acima do máximo
+logger.propagate = False  # impede de subir pro root
+logger.disabled = True    # desativa por completo
+for handler in logger.handlers[:]:
+    logger.removeHandler(handler)
+
+
 import os
 import subprocess
 
@@ -10,7 +18,7 @@ from utils.file_utils import *
 from utils.test_utils import show_nx_topo
 
 from mininet.log import setLogLevel
-from mn_wifi.cli import CLI
+from mininet.cli import CLI
 from polka.tools import calculate_routeid, shifting
 
 DEBUG = False
@@ -27,6 +35,8 @@ if __name__ == "__main__":
     setLogLevel("info")
     MN_NET = loadMininet(NETWORKX_TOPO)
     run_net(MN_NET)
+    logging.getLogger('newfn').setLevel(logging.WARNING)
+    logging.getLogger('newfn').handlers.clear()
 
     while True:
         try:
@@ -53,6 +63,8 @@ if __name__ == "__main__":
 
                 ############### IDA ###############
                 chosen_path = menu2(all_paths)
+                if chosen_path == 0:
+                    continue
 
                 ################ core nodes ################
                 for node in chosen_path:
@@ -138,6 +150,9 @@ if __name__ == "__main__":
                         source = hosts[i].name
                         target = hosts[j].name
 
+                        print(f"\nSource: {source}")
+                        print(f"Target: {target}\n")
+
                         all_paths = get_all_paths_between_hosts(NETWORKX_TOPO, source, target)
 
                         if source == target:
@@ -221,7 +236,11 @@ if __name__ == "__main__":
                 print('\nTables emptied.')
             
             elif action == 4:
+                logging.getLogger('newfn').setLevel(logging.WARNING)
                 CLI(MN_NET)
+
+            elif action == 5:
+                debug_menu(NETWORKX_TOPO)
 
         except Exception as e:
             print(f"Error: {e}")

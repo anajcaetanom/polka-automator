@@ -1,6 +1,8 @@
 import re
 import os
 
+from utils.test_utils import *
+
 def get_host(prompt):
     """
     Get a valid host input from the user.
@@ -26,11 +28,12 @@ def menu1():
             print("2. Generate route-ID for all paths.")
             print("3. Empty all tables.")
             print("4. Open Mininet CLI.")
+            print("5. Debug menu.")
             print("0. Exit.")
 
             action = input("\nSelect an option: ").strip()
 
-            if action in ('0', '1', '2', '3', '4'):
+            if action in ('0', '1', '2', '3', '4', '5'):
                 return int(action)
             else:
                 print("Invalid option. Please try again.")
@@ -50,7 +53,7 @@ def menu2(all_paths):
                 option = int(input("\nType the number of a path to choose, or 0 to quit: "))
                 if (option == 0):
                     print("Exiting...")
-                    break
+                    return 0
                 elif (1 <= option <= len(all_paths)):
                     chosen_path = all_paths[option - 1]
                     print(f"You chose path {option}.\n")
@@ -92,3 +95,25 @@ def choose_topo_menu(pasta="topologies"):
                 print(f"Invalid option. Try again.")
         except ValueError:
             print("Invalid entry. Type a number.")
+
+def debug_menu(nx_topo):
+    while True:
+        try:
+            print("\n--- Debug Menu ---")
+            print("1. Show networkx topology graph.")
+            print("2. List networkx topology nodes.")
+            print("0. Go back")
+
+            choice = int(input("Select a option: "))
+
+            if choice == 0:
+                break
+            elif choice == 1:
+                show_nx_topo(nx_topo)
+            elif choice == 2:
+                print_nodes_by_type(nx_topo)
+            else: 
+                print(f"Invalid option. Try again.")
+        except ValueError:
+            print("Invalid entry. Type a number.")
+        
