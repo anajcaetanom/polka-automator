@@ -2,6 +2,7 @@ import networkx
 import csv
 import sys
 import ast
+import os
 
 def get_node_number(node):
     """
@@ -262,4 +263,6 @@ def extract_polys_from_csv(file_path):
     print("Polynomials extracted from CSV.")
 
 if __name__ == '__main__':
-    extract_polys_from_csv('csv/irr_poly_table1_16.csv')
+    BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+    csv_path = os.path.join(BASE_DIR, "csv", "irr_poly_table1_16.csv")
+    extract_polys_from_csv(csv_path)
