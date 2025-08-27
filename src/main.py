@@ -1,3 +1,4 @@
+import logging
 import os
 import subprocess
 
@@ -13,6 +14,11 @@ from polka.tools import calculate_routeid, shifting
 DEBUG = False
 
 if __name__ == "__main__":
+
+    # Remove qualquer configuração de log pré-existente (feita por outras libs)
+    root = logging.getLogger()
+    for handler in root.handlers[:]:
+        root.removeHandler(handler)
 
     current_file = os.path.abspath(__file__)
     project_root = os.path.abspath(os.path.join(current_file, "..", ".."))
