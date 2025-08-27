@@ -19,8 +19,11 @@ def loadMininet(nx_topology):
     Iniciates a Mininet Wifi network, and constructs the mininet topology based on the NetworkX topology.
     """
     net = Mininet_wifi()
+    current_file = os.path.abspath(__file__)
+    project_root = os.path.abspath(os.path.join(current_file, "..", ".."))
 
     for node in nx_topology.nodes():
+        config = os.path.join(project_root, "polka", "config", f"{node}-commands.txt")
         node_number = get_node_number(node)
 
         if nx_topology.nodes[node]['type'] == 'host':
@@ -31,10 +34,8 @@ def loadMininet(nx_topology):
 
         elif nx_topology.nodes[node]['type'] == 'leaf':
             # read the network configuration
-            path = os.path.dirname(os.path.abspath(__file__))
-            json_file = path + "/polka/polka-edge.json"
-            config = path + f"/polka/config/{node}-commands.txt"
-            # add P4 switches (core)
+            json_file = os.path.join(project_root, "polka", "polka-edge.json")
+            # add P4 switches (edge)
             net.addSwitch(
                 f"{node}",
                 netcfg=True,
@@ -47,10 +48,8 @@ def loadMininet(nx_topology):
 
         elif nx_topology.nodes[node]['type'] == 'core':
             # read the network configuration
-            path = os.path.dirname(os.path.abspath(__file__))
-            json_file = path + "/polka/polka-core.json"
-            config = path + f"/polka/config/{node}-commands.txt"
-            # Add P4 switches (core)
+            json_file = os.path.join(project_root, "polka", "polka-core.json")
+            # add P4 switches (core)
             net.addSwitch(
                 f"{node}",
                 netcfg=True,
