@@ -2,11 +2,11 @@
 
 This repository contains scripts and tools to automate tasks related to **PolKA** (Polynomial Key-based Architecture for Source Routing), using **Mininet** and **NetworkX**.
 
-## 📌 About the Project
+## About the Project
 
 The main goal of this project is to simplify the manipulation of network topologies, as well as the simulation and testing of the PolKA architecture. It aims to reduce manual work when setting up test environments, routing logic, and other network-related operations.
 
-## ⚙️ How To Use
+## How To Use
 
 ### Creating the Virtual Machine
 
@@ -84,12 +84,35 @@ The main goal of this project is to simplify the manipulation of network topolog
 1. Follow the terminal prompts to interact.
     
 
-## 🚀 Features (in progress)
+## Usage Examples and Results
 
-- GML Topology Parsing with NetworkX
+### Menu
 
-- Mininet Integration
+The following image shows the first menu displayed when running main.py.
+![First menu](docs/images/choose_topo.png)
 
-- Source Routing with PolKA (Polynomial Key-based Architecture)
+The second image shows the next menu, where users can select different options to configure the topology, run tests, and interact with the PolKA environment after choosing the GML file.
+![Main menu](docs/images/menu.png)
 
-- Custom Topology Support
+### Mininet Topology
+
+The output below lists all nodes and links created in the emulated topology. This confirms that the network has been successfully instantiated according to the chosen configuration.
+![Mininet topology](docs/images/nodes_e_links.png)
+
+### Ping Tests
+
+The following screenshot shows the result of a ping command executed between two specific hosts. The successful replies confirm that point-to-point connectivity is working as expected.
+![Single ping](docs/images/1ping.png)
+
+The image below presents the output of the pingall command, where every host in the topology attempts to reach all others. The results confirm end-to-end connectivity across the entire network.
+![Pingall](docs/images/pingall.png)
+
+### Iperf Test
+
+The image below shows the results of an iperf test performed between two hosts. This measurement demonstrates the available bandwidth and verifies end-to-end data transmission performance.
+![Iperf](docs/images/iperf.png)
+
+### P4 Switch Log
+
+The following log excerpt comes from a P4 software switch running inside the emulation. It shows the installation and execution of forwarding rules, confirming that PolKA source routing is being applied as expected.
+![P4 Switch Log](docs/images/log_e1_ping_h2.png)
