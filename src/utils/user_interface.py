@@ -33,7 +33,7 @@ def menu1():
 
             action = input("\nSelect an option: ").strip()
 
-            if action in ('0', '1', '2', '3', '4'):
+            if action in ('0', '1', '2', '3', '4', '5'):
                 return int(action)
             else:
                 print("Invalid option. Please try again.")

@@ -259,23 +259,24 @@ if __name__ == "__main__":
                 hosts = MN_NET.hosts
 
                 for i in range(len(hosts)):
-                    for j in range(len(hosts)):
-                        source = hosts[i].name
-                        target = hosts[j].name
+                    source = hosts[i].name
 
-                        if source == target:
-                            continue
-
-                        host_number = get_node_number(source)
-                        switch_label = f'e{host_number}'
-                        switch = net.get(switch_label)
-                        filename = f'{switch_label}-commands.txt'
-                        complete_path = os.path.join(pasta, filename)
-                        with open(complete_path, 'r') as arquivo:
-                            next(arquivo) # pula a primeira linha
-                            for linha in arquivo:
-                                switch.cmd(linha)
-                                
+                    host_number = get_node_number(source)
+                    switch_label = f'e{host_number}'
+                    switch = MN_NET.get(switch_label)
+                    filename = f'{switch_label}-commands.txt'
+                    complete_path = os.path.join(pasta, filename)
+                    with open(complete_path, 'r') as arquivo:
+                        next(arquivo) # pula a primeira linha
+                        for linha in arquivo:
+                            partes = linha.split()
+                            switch.bmv2Thrift(*partes) # passa cada parte como um parametro
+                            ip_com_mascara = partes[3]
+                            ip_partes = ip_com_mascara.split("/")
+                            ip_destino = ip_partes[0]
+                            route_id = partes[-1]
+                            print(f'\nPing {source} to {ip_destino}. RouteID: {route_id}')
+                            print(hosts[i].cmd(f'ping -c 1 {ip_destino}'))
 
         except Exception as e:
             print(f"Error: {e}")
