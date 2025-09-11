@@ -29,9 +29,9 @@ if __name__ == "__main__":
 
     attribute_node_ids(NETWORKX_TOPO, "polynomials.txt")
 
-    print("\nStarting mininet...")
     MN_NET = loadMininet(NETWORKX_TOPO)
-    run_net(MN_NET)
+    print("\nStarting mininet...")
+    run_net(MN_NET) 
 
     while True:
         try:
@@ -43,7 +43,7 @@ if __name__ == "__main__":
                 print("Exiting...")
                 break
 
-            elif action == 1:  
+            elif action == 1: 
                 pasta = os.path.join(project_root, "polka", "config")
                 if not os.path.exists(pasta):
                     os.makedirs(pasta)
@@ -130,6 +130,11 @@ if __name__ == "__main__":
                 else:
                     print("Table already contains that line.")
 
+                print('Stopping and cleaning mininet...')
+                MN_NET.stop()
+                subprocess.run(['sudo', 'mn', '-c']) 
+                print("Exiting...")
+
             elif action == 2:
                 print("\nGenerating IDs for all paths...\n")
                 pasta = os.path.join(project_root, "polka", "config")
@@ -145,8 +150,8 @@ if __name__ == "__main__":
                         source = hosts[i].name
                         target = hosts[j].name
 
-                        print(f"\nSource: {source}")
-                        print(f"Target: {target}\n")
+                        # print(f"\nSource: {source}")
+                        # print(f"Target: {target}\n")
 
                         all_paths = get_all_paths_between_hosts(NETWORKX_TOPO, source, target)
 
@@ -209,6 +214,11 @@ if __name__ == "__main__":
                             with open(complete_path, 'w') as arquivo:
                                 arquivo.write(linha)
 
+                print('Stopping and cleaning mininet...')
+                MN_NET.stop()
+                subprocess.run(['sudo', 'mn', '-c']) 
+                print("Exiting...")
+
             elif action == 3:
                 print("Emptying all tables...")
 
@@ -229,12 +239,43 @@ if __name__ == "__main__":
                         with open(complete_path, 'w'):
                             pass
                 print('\nTables emptied.')
+
+                if MN_NET:
+                    print('Stopping and cleaning mininet...')
+                    MN_NET.stop()
+                    subprocess.run(['sudo', 'mn', '-c']) 
             
             elif action == 4:
+                print("\nStarting mininet...")
+                run_net(MN_NET) 
                 CLI(MN_NET)
 
             elif action == 5:
-                debug_menu(NETWORKX_TOPO)
+                pasta = os.path.join(project_root, "polka", "config")
+                if not os.path.exists(pasta):
+                    print("pasta config não existe.")
+                    break
+
+                hosts = MN_NET.hosts
+
+                for i in range(len(hosts)):
+                    for j in range(len(hosts)):
+                        source = hosts[i].name
+                        target = hosts[j].name
+
+                        if source == target:
+                            continue
+
+                        host_number = get_node_number(source)
+                        switch_label = f'e{host_number}'
+                        switch = net.get(switch_label)
+                        filename = f'{switch_label}-commands.txt'
+                        complete_path = os.path.join(pasta, filename)
+                        with open(complete_path, 'r') as arquivo:
+                            next(arquivo) # pula a primeira linha
+                            for linha in arquivo:
+                                switch.cmd(linha)
+                                
 
         except Exception as e:
             print(f"Error: {e}")

@@ -10,7 +10,7 @@ def loadNXtopology(file):
     """
     Loads a topology from a GML file.
     """
-    #file = 'topology.gml'
+    # file = 'topology.gml'
     topology = networkx.read_gml(file, label='label')
     return topology
 
@@ -64,5 +64,4 @@ def loadMininet(nx_topology):
     for u, v in nx_topology.edges():
         net.addLink(u, v, bw=10)
 
-    return net  
-
+    return net 

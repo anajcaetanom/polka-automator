@@ -28,12 +28,12 @@ def menu1():
             print("2. Generate route-ID for all paths.")
             print("3. Empty all tables.")
             print("4. Open Mininet CLI.")
-            print("5. Debug menu.")
+            print("5. Ping all paths (non-linear topology).")
             print("0. Exit.")
 
             action = input("\nSelect an option: ").strip()
 
-            if action in ('0', '1', '2', '3', '4', '5'):
+            if action in ('0', '1', '2', '3', '4'):
                 return int(action)
             else:
                 print("Invalid option. Please try again.")
