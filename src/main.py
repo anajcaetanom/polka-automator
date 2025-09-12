@@ -130,10 +130,7 @@ if __name__ == "__main__":
                 else:
                     print("Table already contains that line.")
 
-                print('Stopping and cleaning mininet...')
-                MN_NET.stop()
-                subprocess.run(['sudo', 'mn', '-c']) 
-                print("Exiting...")
+                print("\nYou have altered tables. Please reboot the mininet topology.\n")
 
             elif action == 2:
                 print("\nGenerating IDs for all paths...\n")
@@ -214,10 +211,7 @@ if __name__ == "__main__":
                             with open(complete_path, 'w') as arquivo:
                                 arquivo.write(linha)
 
-                print('Stopping and cleaning mininet...')
-                MN_NET.stop()
-                subprocess.run(['sudo', 'mn', '-c']) 
-                print("Exiting...")
+                print("\nYou have altered tables. Please reboot the mininet topology.\n")
 
             elif action == 3:
                 print("Emptying all tables...")
@@ -240,14 +234,10 @@ if __name__ == "__main__":
                             pass
                 print('\nTables emptied.')
 
-                if MN_NET:
-                    print('Stopping and cleaning mininet...')
-                    MN_NET.stop()
-                    subprocess.run(['sudo', 'mn', '-c']) 
+                print("\nYou have altered tables. Please reboot the mininet topology.\n")
             
             elif action == 4:
-                print("\nStarting mininet...")
-                run_net(MN_NET) 
+                print("\nStarting CLI...")
                 CLI(MN_NET)
 
             elif action == 5:
