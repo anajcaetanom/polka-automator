@@ -82,7 +82,13 @@ The main goal of this project is to simplify the manipulation of network topolog
     ```
 
 1. Follow the terminal prompts to interact.
-    
+
+---
+### Important Notes
+
+- Whenever you load a **new topology**, make sure to **clear the tables** and **generate the appropriate `routeIDs`**.  
+- Whenever you **modify the tables**, you must **restart Mininet** for the changes to take effect.  
+---
 
 ## Usage Examples and Results
 
