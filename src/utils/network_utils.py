@@ -262,6 +262,23 @@ def extract_polys_from_csv(file_path):
 
     print("Polynomials extracted from CSV.")
 
+def initial_config_switches(NETWORKX_TOPO, MN_NET):
+    for node in NETWORKX_TOPO.nodes():
+        if NETWORKX_TOPO.nodes[node]['type'] == 'core':
+            node_id = NETWORKX_TOPO.nodes[node]['node_id']
+            hex_node = hex_node_id(node_id)
+            linha = f"set_crc16_parameters calc {hex_node} 0x0 0x0 false false"
+            partes = linha.split()
+            switch = MN_NET.get(node)
+            switch.bmv2Thrift(*partes)
+        
+        if NETWORKX_TOPO.nodes[node]['type'] == 'leaf':
+            linha = "table_set_default tunnel_encap_process_sr tdrop"
+            partes = linha.split()
+            switch = MN_NET.get(node)
+            switch.bmv2Thrift(*partes)
+
+
 if __name__ == '__main__':
     BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
     csv_path = os.path.join(BASE_DIR, "csv", "irr_poly_table1_16.csv")

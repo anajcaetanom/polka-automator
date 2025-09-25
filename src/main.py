@@ -28,10 +28,12 @@ if __name__ == "__main__":
     NETWORKX_TOPO = loadNXtopology(selected_topo)
 
     attribute_node_ids(NETWORKX_TOPO, "polynomials.txt")
+    
 
     MN_NET = loadMininet(NETWORKX_TOPO)
     print("\nStarting mininet...")
     run_net(MN_NET) 
+    initial_config_switches(NETWORKX_TOPO, MN_NET)
 
     while True:
         try:
@@ -44,9 +46,6 @@ if __name__ == "__main__":
                 break
 
             elif action == 1: 
-                pasta = os.path.join(project_root, "polka", "config")
-                if not os.path.exists(pasta):
-                    os.makedirs(pasta)
 
                 source = get_host("\nType the source host (ex: h1): ")
                 target = get_host("Type the target host (ex: h2): ")
@@ -60,46 +59,24 @@ if __name__ == "__main__":
                 chosen_path = menu2(all_paths)
                 if chosen_path == 0:
                     continue
-
-                ################ core nodes ################
-                for node in chosen_path:
-                    if NETWORKX_TOPO.nodes[node]['type'] == 'core':
-                        node_id = NETWORKX_TOPO.nodes[node]['node_id']
-                        hex_node = hex_node_id(node_id)
-                        linha = f"set_crc16_parameters calc {hex_node} 0x0 0x0 false false"
-                        filename = f'{node}-commands.txt'
-                        complete_path = os.path.join(pasta, filename)
-                        if not contains_line(complete_path, linha):
-                            with open(complete_path, 'w') as arquivo:
-                                arquivo.write(linha)
                 
                 ################# edge nodes #################  
                 path_node_ids = get_node_ids(NETWORKX_TOPO, chosen_path)
                 port_ids = decimal_to_binary(get_output_ports_list(chosen_path, MN_NET, NETWORKX_TOPO))
                 routeID = calculate_routeid(path_node_ids, port_ids, debug=DEBUG)
-                target_ip = MN_NET.get(target).IP() 
+                target_ip = MN_NET.get(target).IP()
                 output_port = get_leaf_to_core_port_from_path(MN_NET, chosen_path, NETWORKX_TOPO)
                 target_mac = MN_NET.get(target).MAC()
                 routeID_int = shifting(routeID)
 
                 linha = f"table_add tunnel_encap_process_sr add_sourcerouting_header {target_ip}/32 => {output_port} {target_mac} {routeID_int}"
-
+                partes = linha.split()
+                
                 second_node = chosen_path[1]
                 if NETWORKX_TOPO.nodes[second_node].get('type') == 'leaf':
-                    node_number = get_node_number(second_node)
-                filename = f'e{node_number}-commands.txt'
-                complete_path = os.path.join(pasta, filename)
-                first_line = "table_set_default tunnel_encap_process_sr tdrop"
-                if not contains_line(complete_path, first_line):
-                    with open(complete_path, 'a') as arquivo:  # 'a' = append
-                        arquivo.write(first_line)
-                if not contains_line(complete_path, linha):
-                    with open(complete_path, 'a') as arquivo:  
-                        arquivo.write('\n' + linha)
-                    clean_and_sort_file(complete_path)
-                    print('\nInfos adicionadas na tabela.')
-                else:
-                    print("Table already contains that line.")
+                    switch = MN_NET.get(second_node)
+                    print(f"second_node: {switch}")
+                    switch.bmv2Thrift(*partes)
                 
                 ############### VOLTA ###############
                 path_volta = chosen_path[::-1] # ?só inverti o caminho escolhido?
@@ -115,22 +92,9 @@ if __name__ == "__main__":
 
                 second_node = chosen_path[1]
                 if NETWORKX_TOPO.nodes[second_node].get('type') == 'leaf':
-                    node_number = get_node_number(second_node)
-                filename = f'e{node_number}-commands.txt'
-                complete_path = os.path.join(pasta, filename)
-                first_line = "table_set_default tunnel_encap_process_sr tdrop"
-                if not contains_line(complete_path, first_line):
-                    with open(complete_path, 'a') as arquivo:  # 'a' = append
-                        arquivo.write(first_line)
-                if not contains_line(complete_path, linha):
-                    with open(complete_path, 'a') as arquivo:
-                        arquivo.write('\n' + linha)
-                    clean_and_sort_file(complete_path)
-                    print('\nInfos adicionadas na tabela.')
-                else:
-                    print("Table already contains that line.")
-
-                print("\nYou have altered tables. Please reboot the mininet topology.\n")
+                    switch = MN_NET.get(second_node)
+                    print(f"second_node: {switch}")
+                    switch.bmv2Thrift(*partes)
 
             elif action == 2:
                 print("\nGenerating IDs for all paths...\n")
