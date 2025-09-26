@@ -19,6 +19,7 @@ if __name__ == "__main__":
     root = logging.getLogger()
     for handler in root.handlers[:]:
         root.removeHandler(handler)
+    #
 
     current_file = os.path.abspath(__file__)
     project_root = os.path.abspath(os.path.join(current_file, "..", ".."))
@@ -32,12 +33,13 @@ if __name__ == "__main__":
 
     MN_NET = loadMininet(NETWORKX_TOPO)
     print("\nStarting mininet...")
+    basic_config_switches(NETWORKX_TOPO, project_root)
     run_net(MN_NET) 
-    initial_config_switches(NETWORKX_TOPO, MN_NET)
 
     while True:
         try:
             action = menu1()
+
             if action == 0:
                 print('Stopping and cleaning mininet...')
                 MN_NET.stop()
@@ -60,7 +62,6 @@ if __name__ == "__main__":
                 if chosen_path == 0:
                     continue
                 
-                ################# edge nodes #################  
                 path_node_ids = get_node_ids(NETWORKX_TOPO, chosen_path)
                 port_ids = decimal_to_binary(get_output_ports_list(chosen_path, MN_NET, NETWORKX_TOPO))
                 routeID = calculate_routeid(path_node_ids, port_ids, debug=DEBUG)
@@ -70,12 +71,11 @@ if __name__ == "__main__":
                 routeID_int = shifting(routeID)
 
                 linha = f"table_add tunnel_encap_process_sr add_sourcerouting_header {target_ip}/32 => {output_port} {target_mac} {routeID_int}"
-                partes = linha.split()
                 
                 second_node = chosen_path[1]
                 if NETWORKX_TOPO.nodes[second_node].get('type') == 'leaf':
                     switch = MN_NET.get(second_node)
-                    print(f"second_node: {switch}")
+                    partes = linha.split()
                     switch.bmv2Thrift(*partes)
                 
                 ############### VOLTA ###############
@@ -90,10 +90,10 @@ if __name__ == "__main__":
 
                 linha = f"table_add tunnel_encap_process_sr add_sourcerouting_header {target_ip}/32 => {output_port} {target_mac} {routeID_int}"
 
-                second_node = chosen_path[1]
+                second_node = path_volta[1]
                 if NETWORKX_TOPO.nodes[second_node].get('type') == 'leaf':
                     switch = MN_NET.get(second_node)
-                    print(f"second_node: {switch}")
+                    partes = linha.split()
                     switch.bmv2Thrift(*partes)
 
             elif action == 2:

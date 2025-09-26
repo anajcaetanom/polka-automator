@@ -4,6 +4,8 @@ import sys
 import ast
 import os
 
+from file_utils import contains_line
+
 def get_node_number(node):
     """
     Gets the number of a node based on its label.
@@ -262,21 +264,31 @@ def extract_polys_from_csv(file_path):
 
     print("Polynomials extracted from CSV.")
 
-def initial_config_switches(NETWORKX_TOPO, MN_NET):
+def basic_config_switches(NETWORKX_TOPO, project_root):
+    pasta = os.path.join(project_root, "polka", "config")
+    if not os.path.exists(pasta):
+        os.makedirs(pasta)
+
     for node in NETWORKX_TOPO.nodes():
+        filename = f'{node}-commands.txt'
+        complete_path = os.path.join(pasta, filename)
+
         if NETWORKX_TOPO.nodes[node]['type'] == 'core':
             node_id = NETWORKX_TOPO.nodes[node]['node_id']
             hex_node = hex_node_id(node_id)
             linha = f"set_crc16_parameters calc {hex_node} 0x0 0x0 false false"
-            partes = linha.split()
-            switch = MN_NET.get(node)
-            switch.bmv2Thrift(*partes)
+
+            if not contains_line(complete_path, linha):
+                with open(complete_path, 'w') as arquivo:
+                    arquivo.write(linha)
         
         if NETWORKX_TOPO.nodes[node]['type'] == 'leaf':
             linha = "table_set_default tunnel_encap_process_sr tdrop"
-            partes = linha.split()
-            switch = MN_NET.get(node)
-            switch.bmv2Thrift(*partes)
+
+            if not contains_line(complete_path, linha):
+                with open(complete_path, 'w') as arquivo:
+                    arquivo.write(linha)
+
 
 
 if __name__ == '__main__':
