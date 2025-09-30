@@ -1,6 +1,7 @@
 import logging
 import os
 import subprocess
+import networkx
 
 from load_topology import loadNXtopology, loadMininet
 from run_topology import run_net
@@ -30,11 +31,10 @@ if __name__ == "__main__":
 
     attribute_node_ids(NETWORKX_TOPO, "polynomials.txt")
     
-
+    basic_config_switches(NETWORKX_TOPO, project_root)
     MN_NET = loadMininet(NETWORKX_TOPO)
     print("\nStarting mininet...")
-    basic_config_switches(NETWORKX_TOPO, project_root)
-    run_net(MN_NET) 
+    run_net(MN_NET)
 
     while True:
         try:
@@ -97,85 +97,56 @@ if __name__ == "__main__":
                     switch.bmv2Thrift(*partes)
 
             elif action == 2:
-                print("\nGenerating IDs for all paths...\n")
-                pasta = os.path.join(project_root, "polka", "config")
-                if not os.path.exists(pasta):
-                    os.makedirs(pasta)
+                hosts = MN_NET.hosts 
 
-                ################# edge nodes #################
-                hosts = MN_NET.hosts
-                comandos_por_arquivo = {}    
-
+                ##################### CONFIG SWITCHES #####################
                 for i in range(len(hosts)):
+                    source = hosts[i].name
                     for j in range(len(hosts)):
-                        source = hosts[i].name
                         target = hosts[j].name
 
-                        # print(f"\nSource: {source}")
-                        # print(f"Target: {target}\n")
-
-                        all_paths = get_all_paths_between_hosts(NETWORKX_TOPO, source, target)
-
                         if source == target:
-                            path = []
-                            path.append(source)
-                            leaf = get_leaf(NETWORKX_TOPO, source)
-                            path.append(leaf)
-                            path.append(target)
-                            all_paths.append(path)
-
-                        if not all_paths:
                             continue
 
-                        for path in all_paths:
-                            chosen_path = path
+                        try:
+                            path = networkx.shortest_path(NETWORKX_TOPO, source, target)
+                        except Exception as e:
+                            print(f"Error: {e}")
+                            break  
 
-                            if connected_to_same_leaf(NETWORKX_TOPO, source, target):
-                                routeID_int = 0
-                                output_port = get_output_port(MN_NET, chosen_path[1], target)
-                            else:
-                                path_node_ids = get_node_ids(NETWORKX_TOPO, chosen_path)
-                                port_ids = decimal_to_binary(get_output_ports_list(chosen_path, MN_NET, NETWORKX_TOPO))
-                                routeID = calculate_routeid(path_node_ids, port_ids, debug=DEBUG)
-                                routeID_int = shifting(routeID)
-                                output_port = get_leaf_to_core_port_from_path(MN_NET, chosen_path, NETWORKX_TOPO)
+                        print(f"source: {source}") 
+                        print(f"target: {target}") 
+                        print(f"path: {path}") 
 
-                            target_ip = MN_NET.get(target).IP()
-                            target_mac = MN_NET.get(target).MAC()
 
-                            linha = f"table_add tunnel_encap_process_sr add_sourcerouting_header {target_ip}/32 => {output_port} {target_mac} {routeID_int}"
+                        ############ IDA ############
+                        path_node_ids = get_node_ids(NETWORKX_TOPO, path)
+                        port_ids = decimal_to_binary(get_output_ports_list(path, MN_NET, NETWORKX_TOPO))
+                        routeID = calculate_routeid(path_node_ids, port_ids, debug=DEBUG)
+                        routeID_int = shifting(routeID)
+                        output_port = get_leaf_to_core_port_from_path(MN_NET, path, NETWORKX_TOPO)
 
-                            if chosen_path[1]:
-                                second_node = chosen_path[1]
-                                if NETWORKX_TOPO.nodes[second_node].get('type') == 'leaf':
-                                    filename = f'{second_node}-commands.txt'
-                                    complete_path = os.path.join(pasta, filename)
-                        
-                            first_line = "table_set_default tunnel_encap_process_sr tdrop"
-                            if not contains_line(complete_path, first_line):
-                                with open(complete_path, 'a') as arquivo:  # 'a' = append
-                                    arquivo.write(first_line)
-                            if not contains_line(complete_path, linha):
-                                with open(complete_path, 'a') as arquivo:  
-                                    arquivo.write('\n' + linha)
-                                clean_and_sort_file(complete_path)
-                                print('\nInfos adicionadas na tabela.')
-                            else:
-                                print("Table already contains that line.")
+                        target_ip = MN_NET.get(target).IP()
+                        target_mac = MN_NET.get(target).MAC()
 
-                ################# core nodes #################
-                for node in NETWORKX_TOPO.nodes():
-                    if NETWORKX_TOPO.nodes[node]['type'] == 'core':
-                        node_id = NETWORKX_TOPO.nodes[node]['node_id']
-                        hex_node = hex_node_id(node_id)
-                        linha = f"set_crc16_parameters calc {hex_node} 0x0 0x0 false false"
-                        filename = f'{node}-commands.txt'
-                        complete_path = os.path.join(pasta, filename)
-                        if not contains_line(complete_path, linha):
-                            with open(complete_path, 'w') as arquivo:
-                                arquivo.write(linha)
+                        linha = f"table_add tunnel_encap_process_sr add_sourcerouting_header {target_ip}/32 => {output_port} {target_mac} {routeID_int}"
+                        partes = linha.split()
 
-                print("\nYou have altered tables. Please reboot the mininet topology.\n")
+                        second_node = path[1]
+                        if NETWORKX_TOPO.nodes[second_node].get('type') == 'leaf':
+                            switch = MN_NET.get(second_node)
+                            # configura o switch
+                            switch.bmv2Thrift(*partes) # passa cada parte como um parametro
+
+                ##################### PING #####################
+                for i in range(len(hosts)):
+                    source = hosts[i].name
+                    for j in range(len(hosts)):
+                        target = hosts[j].name
+                        target_ip = MN_NET.get(target).IP()
+
+                        print(f'\nPing {source} to {target}.')
+                        print(hosts[i].cmd(f'ping -c 1 {target_ip}'))
 
             elif action == 3:
                 print("Emptying all tables...")
@@ -204,34 +175,6 @@ if __name__ == "__main__":
                 print("\nStarting CLI...")
                 CLI(MN_NET)
 
-            elif action == 5:
-                pasta = os.path.join(project_root, "polka", "config")
-                if not os.path.exists(pasta):
-                    print("pasta config não existe.")
-                    break
-
-                hosts = MN_NET.hosts
-
-                for i in range(len(hosts)):
-                    source = hosts[i].name
-
-                    host_number = get_node_number(source)
-                    switch_label = f'e{host_number}'
-                    switch = MN_NET.get(switch_label)
-                    filename = f'{switch_label}-commands.txt'
-                    complete_path = os.path.join(pasta, filename)
-                    with open(complete_path, 'r') as arquivo:
-                        next(arquivo) # pula a primeira linha
-                        for linha in arquivo:
-                            partes = linha.split()
-                            switch.bmv2Thrift(*partes) # passa cada parte como um parametro
-                            ip_com_mascara = partes[3]
-                            ip_partes = ip_com_mascara.split("/")
-                            ip_destino = ip_partes[0]
-                            route_id = partes[-1]
-                            print(f'\nPing {source} to {ip_destino}. RouteID: {route_id}')
-                            print(hosts[i].cmd(f'ping -c 1 {ip_destino}'))
-
         except Exception as e:
             print(f"Error: {e}")
-            break 
+            break

@@ -4,7 +4,7 @@ import sys
 import ast
 import os
 
-from file_utils import contains_line
+from utils.file_utils import contains_line
 
 def get_node_number(node):
     """
