@@ -1,5 +1,20 @@
 syntax = "proto3";
 
+package polkaAutomator;
+
 service PolkaAutomatorService {
-    
+    rpc Paths (PathsRequest) returns (PathsResponse);
+}
+
+message PathsRequest {
+    string source = 1;
+    string target = 2;
+}
+
+message PathsResponse {
+    repeated Path paths = 1;
+}
+
+message Path {
+    repeated string nodes = 1;
 }
