@@ -2,9 +2,8 @@ import logging
 import os
 import subprocess
 import networkx
+import grpc
 
-from load_topology import loadNXtopology, loadMininet
-from run_topology import run_net
 from utils.user_interface import *
 from utils.network_utils import *
 from utils.file_utils import *
@@ -25,42 +24,24 @@ current_file = os.path.abspath(__file__)
 project_root = os.path.abspath(os.path.join(current_file, "..", ".."))
 
 pasta_topo = os.path.join(project_root, "topologies")
-# selected_topo = choose_topo_menu(pasta_topo) 
-# NETWORKX_TOPO = loadNXtopology(selected_topo)
 
-# attribute_node_ids(NETWORKX_TOPO, "polynomials.txt")
-
-# basic_config_switches(NETWORKX_TOPO, project_root)
-# MN_NET = loadMininet(NETWORKX_TOPO)
-# print("\nStarting mininet...")
-# run_net(MN_NET)
-
-
-def stop_net(MN_NET):
-    print('Stopping and cleaning mininet...')
-    MN_NET.stop()
-    subprocess.run(['sudo', 'mn', '-c']) 
-    print("Exiting...")
-    return
 
 def show_paths(source, target, NETWORKX_TOPO):
     all_paths = get_all_paths_between_hosts(NETWORKX_TOPO, source, target)
 
+    if not all_paths:
+        return [], "no paths found."
 
-def config_single_path(source, target, NETWORKX_TOPO, MN_NET):
+    # Numera e formata cada caminho como "0: h1 -> s1 -> s2 -> h2"
+    return [f"{i}: {' -> '.join(path)}" for i, path in enumerate(all_paths)]
 
-    source = get_host("\nType the source host (ex: h1): ")
-    target = get_host("Type the target host (ex: h2): ")
 
-    # print all paths between source and target and let the user choose one.
+def config_single_path(index, source, target, NETWORKX_TOPO, MN_NET):
+
     all_paths = get_all_paths_between_hosts(NETWORKX_TOPO, source, target)
-    
-    print(f"\nFound {len(all_paths)} paths between {source} and {target}:\n")
 
     ############### IDA ###############
-    chosen_path = menu2(all_paths)
-    if chosen_path == 0:
-        continue
+    chosen_path = all_paths[index]
     
     path_node_ids = get_node_ids(NETWORKX_TOPO, chosen_path)
     port_ids = decimal_to_binary(get_output_ports_list(chosen_path, MN_NET, NETWORKX_TOPO))
@@ -79,7 +60,7 @@ def config_single_path(source, target, NETWORKX_TOPO, MN_NET):
         switch.bmv2Thrift(*partes)
     
     ############### VOLTA ###############
-    path_volta = chosen_path[::-1] # ?só inverti o caminho escolhido?
+    path_volta = chosen_path[::-1]
     path_node_ids = get_node_ids(NETWORKX_TOPO, path_volta)
     port_ids = decimal_to_binary(get_output_ports_list(path_volta, MN_NET, NETWORKX_TOPO))
     routeID = calculate_routeid(path_node_ids, port_ids, debug=DEBUG)
@@ -96,7 +77,10 @@ def config_single_path(source, target, NETWORKX_TOPO, MN_NET):
         partes = linha.split()
         switch.bmv2Thrift(*partes)
 
-elif action == 2:
+    return
+
+
+def pingall(MN_NET, NETWORKX_TOPO):
     hosts = MN_NET.hosts 
 
     ##################### CONFIG SWITCHES #####################
@@ -138,6 +122,9 @@ elif action == 2:
                 # configura o switch
                 switch.bmv2Thrift(*partes) # passa cada parte como um parametro
 
+
+    ping_outputs = []
+
     ##################### PING #####################
     for i in range(len(hosts)):
         source = hosts[i].name
@@ -145,32 +132,7 @@ elif action == 2:
             target = hosts[j].name
             target_ip = MN_NET.get(target).IP()
 
-            print(f'\nPing {source} to {target}.')
-            print(hosts[i].cmd(f'ping -c 1 {target_ip}'))
+            out = hosts[i].cmd(f'ping -c 1 {target_ip}')
+            ping_outputs.append(out) 
 
-elif action == 3:
-    print("Emptying all tables...")
-
-    pasta = os.path.join(project_root, "polka", "config")
-    if not os.path.exists(pasta):
-        os.makedirs(pasta)
-
-    for node in NETWORKX_TOPO.nodes():
-        if NETWORKX_TOPO.nodes[node]['type'] == 'leaf':
-            filename = f'{node}-commands.txt'
-            complete_path = os.path.join(pasta, filename)
-            with open(complete_path, 'w'):
-                pass
-    for node in NETWORKX_TOPO.nodes():
-        if NETWORKX_TOPO.nodes[node]['type'] == 'core':
-            filename = f'{node}-commands.txt'
-            complete_path = os.path.join(pasta, filename)
-            with open(complete_path, 'w'):
-                pass
-    print('\nTables emptied.')
-
-    print("\nYou have altered tables. Please reboot the mininet topology.\n")
-
-elif action == 4:
-    print("\nStarting CLI...")
-    CLI(MN_NET)
+    return ping_outputs
