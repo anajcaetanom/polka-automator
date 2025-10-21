@@ -5,6 +5,12 @@ import ast
 import os
 
 from utils.file_utils import contains_line
+from utils.load_topology import loadNXtopology, loadMininet
+from utils.run_topology import run_net
+
+CURRENT_FILE = os.path.abspath(__file__)
+PROJECT_ROOT = os.path.abspath(os.path.join(CURRENT_FILE, "..", ".."))
+
 
 def get_node_number(node):
     """

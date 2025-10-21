@@ -65,35 +65,24 @@ def menu2(all_paths):
         print(f"[Error] in menu2: {e}")
         return None
     
-def choose_topo_menu(pasta="topologies"):
+def choose_topo_menu(pasta="topology"):
     """
-    Allows user to choose a topology file.
+    Automatically selects the first .gml topology file in the given folder.
     """
     if not os.path.isdir(pasta):
         print(f"Directory does not exist.")
         return None
 
-    arquivos = [file for file in os.listdir(pasta) if file.endswith(".gml")]
+    arquivos = sorted([file for file in os.listdir(pasta) if file.endswith(".gml")])
     if not arquivos:
         print(f"No .gml files available in directory.")
         return None
-    
-    print(f"\nAvailable topologies:")
-    for i, file in enumerate(arquivos, start=1):
-        print(f"{i}. {file}")
 
-    while True:
-        try:
-            option = int(input(f"\nType the number of a topology option: "))
-            if len(arquivos) >= option >= 1:
-                selected = arquivos[option - 1]
-                print(f"\nTopology selected: {selected}")
-                topo = os.path.join(pasta, selected)
-                return topo
-            else: 
-                print(f"Invalid option. Try again.")
-        except ValueError:
-            print("Invalid entry. Type a number.")
+    selected = arquivos[0]
+    print(f"Topology selected automatically: {selected}")
+    topo = os.path.join(pasta, selected)
+
+    return topo
 
 def debug_menu(nx_topo):
     """

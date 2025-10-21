@@ -8,6 +8,7 @@ from utils.user_interface import *
 from utils.network_utils import *
 from utils.file_utils import *
 
+
 from mininet.cli import CLI
 from polka.tools import calculate_routeid, shifting
 
@@ -20,10 +21,24 @@ for handler in root.handlers[:]:
     root.removeHandler(handler)
 ####################
 
+
 current_file = os.path.abspath(__file__)
 project_root = os.path.abspath(os.path.join(current_file, "..", ".."))
 
-pasta_topo = os.path.join(project_root, "topologies")
+gml = os.path.join(project_root, "topology")
+
+
+
+def init_net():
+    pasta_topo = os.path.join(project_root, "topologies")
+
+    selected_topo = choose_topo_menu(pasta_topo)
+
+    NETWORKX_TOPO = loadNXtopology(selected_topo)
+    polys = os.path.join(project_root, "polynomials.txt")
+    attribute_node_ids(NETWORKX_TOPO, polys)
+
+    MN_NET = loadMininet(NETWORKX_TOPO)
 
 
 def show_paths(source, target, NETWORKX_TOPO):

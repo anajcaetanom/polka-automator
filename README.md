@@ -22,6 +22,8 @@ The main goal of this project is to simplify the manipulation of network topolog
 
 ### Using the code
 
+1. Insert the p4 files in the polka folder; 
+
 1. Navigate to the PolKA folder and run `make`:
     ```bash
     $ cd polka-automator/polka
@@ -30,10 +32,5 @@ The main goal of this project is to simplify the manipulation of network topolog
     $ make
     ```
 
-1. Run main in the src folder:
-    ```bash
-    $ sudo -E python3 main.py
-    ```
-
-1. Follow the terminal prompts to interact.
+1. Insert the GML file in the "topologies" folder.
     
