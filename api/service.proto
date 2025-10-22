@@ -3,7 +3,17 @@ syntax = "proto3";
 package polkaAutomator;
 
 service PolkaAutomatorService {
-    rpc ShowPaths(ShowPathsRequest) returns (ShowPathsResponse);
+    rpc StartNetwork (Empty) returns (String);
+    rpc StopNetwork (Empty) returns (String);
+    rpc ShowPaths (ShowPathsRequest) returns (ShowPathsResponse);
+    rpc ConfigPath (ConfigPathRequest) returns (String);
+    rpc ConfigShortestPaths (Empty) returns (String);
+}
+
+message Empty {}
+
+message String {
+    string msg = 1;
 }
 
 message ShowPathsRequest {
@@ -13,4 +23,11 @@ message ShowPathsRequest {
 
 message ShowPathsResponse {
     repeated string paths = 1;
+    string msg = 2;
+}
+
+message ConfigPathRequest {
+    string index = 1;
+    string source = 2;
+    string target = 3;
 }
