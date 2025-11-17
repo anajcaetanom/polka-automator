@@ -54,16 +54,16 @@ def stop_net() -> str:
     return "Mininet stopped."
 
 
-def show_paths(source, target):
+def show_paths(source: str, target: str) -> list[str]:
     global networx_topo
     all_paths = get_all_paths_between_hosts(networx_topo, source, target)
     if not all_paths:
-        return [], "no paths found."
+        return ["no paths found."]
     # Numera e formata cada caminho como "0: h1 -> s1 -> s2 -> h2"
     return [f"{i}: {' -> '.join(path)}" for i, path in enumerate(all_paths)]
 
 
-def config_single_path(index, source, target):
+def config_single_path(index: int, source: str, target: str) -> str:
     global networx_topo, mn_net, debug
     all_paths = get_all_paths_between_hosts(networx_topo, source, target)
 
@@ -105,7 +105,7 @@ def config_single_path(index, source, target):
     return f"Path between {source} and {target} configured."
 
 
-def config_shortest_paths():
+def config_shortest_paths() -> str:
     global networx_topo, mn_net, debug
     hosts = mn_net.hosts 
 
