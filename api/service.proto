@@ -6,7 +6,7 @@ service PolkaAutomatorService {
     rpc StartNetwork (Empty) returns (String);
     rpc StopNetwork (Empty) returns (String);
     rpc ShowPaths (ShowPathsRequest) returns (ShowPathsResponse);
-    rpc ConfigPath (ConfigPathRequest) returns (String);
+    rpc ConfigSinglePath (ConfigPathRequest) returns (String);
     rpc ConfigShortestPaths (Empty) returns (String);
 }
 

@@ -4,9 +4,18 @@ import subprocess
 import networkx
 import grpc
 
-from utils.user_interface import *
-from utils.network_utils import *
-from utils.file_utils import *
+from utils.file_utils import get_gml_file
+from utils.network_utils import (
+    loadNXtopology, 
+    attribute_node_ids, 
+    loadMininet, 
+    run_net, 
+    get_all_paths_between_hosts, 
+    get_node_ids,
+    decimal_to_binary,
+    get_output_ports_list,
+    get_leaf_to_core_port_from_path
+)
 
 from mininet.cli import CLI
 from polka.tools import calculate_routeid, shifting
@@ -146,4 +155,9 @@ def config_shortest_paths() -> str:
     return "Shortest path between hosts configured."
 
 
-# def run_command(command: str):
+def open_mininet_CLI() -> str:
+    global mn_net
+    
+    CLI(mn_net)
+
+    return "Mininet CLI initialized."
