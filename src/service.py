@@ -153,11 +153,3 @@ def config_shortest_paths() -> str:
                 switch.bmv2Thrift(*partes) # passa cada parte como um parametro
 
     return "Shortest path between hosts configured."
-
-
-def open_mininet_CLI() -> str:
-    global mn_net
-    
-    CLI(mn_net)
-
-    return "Mininet CLI initialized."
