@@ -21,7 +21,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-class PolkaAutomatorServiceServicer(network_pb2_grpc.PolkaAutomatorServiceServicer):
+class PolkaAutomatorServiceServicer(service_pb2_grpc.PolkaAutomatorServiceServicer):
     """Implementação do serviço gRPC"""
     
     def StartNetwork(self, request, context):
@@ -31,7 +31,7 @@ class PolkaAutomatorServiceServicer(network_pb2_grpc.PolkaAutomatorServiceServic
             message = init_net()
             success = "already running" in message.lower() or "inicialized" in message.lower()
             
-            return network_pb2.Response(
+            return service_pb2.Response(
                 success=success,
                 message=message
             )
@@ -39,7 +39,7 @@ class PolkaAutomatorServiceServicer(network_pb2_grpc.PolkaAutomatorServiceServic
             logger.error(f"Erro em InitNet: {e}")
             context.set_code(grpc.StatusCode.INTERNAL)
             context.set_details(str(e))
-            return network_pb2.Response(
+            return service_pb2.Response(
                 success=False,
                 message=f"Erro: {str(e)}"
             )
@@ -51,7 +51,7 @@ class PolkaAutomatorServiceServicer(network_pb2_grpc.PolkaAutomatorServiceServic
             message = stop_net()
             success = "stopped" in message.lower()
             
-            return network_pb2.Response(
+            return service_pb2.Response(
                 success=success,
                 message=message
             )
@@ -59,7 +59,7 @@ class PolkaAutomatorServiceServicer(network_pb2_grpc.PolkaAutomatorServiceServic
             logger.error(f"Erro em StopNet: {e}")
             context.set_code(grpc.StatusCode.INTERNAL)
             context.set_details(str(e))
-            return network_pb2.Response(
+            return service_pb2.Response(
                 success=False,
                 message=f"Erro: {str(e)}"
             )
@@ -72,7 +72,7 @@ class PolkaAutomatorServiceServicer(network_pb2_grpc.PolkaAutomatorServiceServic
             if not request.source or not request.target:
                 context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
                 context.set_details("Source e target são obrigatórios")
-                return network_pb2.PathsResponse(
+                return service_pb2.ShowPathsResponse(
                     success=False,
                     paths=[],
                     message="Source e target são obrigatórios"
@@ -81,13 +81,13 @@ class PolkaAutomatorServiceServicer(network_pb2_grpc.PolkaAutomatorServiceServic
             paths = show_paths(request.source, request.target)
             
             if paths and paths[0] == "no paths found.":
-                return network_pb2.PathsResponse(
+                return service_pb2.ShowPathsResponse(
                     success=False,
                     paths=[],
                     message="Nenhum caminho encontrado"
                 )
             
-            return network_pb2.PathsResponse(
+            return service_pb2.ShowPathsResponse(
                 success=True,
                 paths=paths,
                 message=f"{len(paths)} caminhos encontrados"
@@ -96,7 +96,7 @@ class PolkaAutomatorServiceServicer(network_pb2_grpc.PolkaAutomatorServiceServic
             logger.error(f"Erro em ShowPaths: {e}")
             context.set_code(grpc.StatusCode.INTERNAL)
             context.set_details(str(e))
-            return network_pb2.PathsResponse(
+            return service_pb2.ShowPathsResponse(
                 success=False,
                 paths=[],
                 message=f"Erro: {str(e)}"
@@ -110,7 +110,7 @@ class PolkaAutomatorServiceServicer(network_pb2_grpc.PolkaAutomatorServiceServic
             if not request.source or not request.target:
                 context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
                 context.set_details("Source e target são obrigatórios")
-                return network_pb2.Response(
+                return service_pb2.Response(
                     success=False,
                     message="Source e target são obrigatórios"
                 )
@@ -118,7 +118,7 @@ class PolkaAutomatorServiceServicer(network_pb2_grpc.PolkaAutomatorServiceServic
             if request.index < 0:
                 context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
                 context.set_details("Index deve ser maior ou igual a 0")
-                return network_pb2.Response(
+                return service_pb2.Response(
                     success=False,
                     message="Index deve ser maior ou igual a 0"
                 )
@@ -126,7 +126,7 @@ class PolkaAutomatorServiceServicer(network_pb2_grpc.PolkaAutomatorServiceServic
             message = config_single_path(request.index, request.source, request.target)
             success = "configured" in message.lower()
             
-            return network_pb2.Response(
+            return service_pb2.Response(
                 success=success,
                 message=message
             )
@@ -134,7 +134,7 @@ class PolkaAutomatorServiceServicer(network_pb2_grpc.PolkaAutomatorServiceServic
             logger.error(f"Index {request.index} fora dos limites")
             context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
             context.set_details("Index de caminho inválido")
-            return network_pb2.Response(
+            return service_pb2.Response(
                 success=False,
                 message="Index de caminho inválido"
             )
@@ -142,7 +142,7 @@ class PolkaAutomatorServiceServicer(network_pb2_grpc.PolkaAutomatorServiceServic
             logger.error(f"Erro em ConfigSinglePath: {e}")
             context.set_code(grpc.StatusCode.INTERNAL)
             context.set_details(str(e))
-            return network_pb2.Response(
+            return service_pb2.Response(
                 success=False,
                 message=f"Erro: {str(e)}"
             )
@@ -154,7 +154,7 @@ class PolkaAutomatorServiceServicer(network_pb2_grpc.PolkaAutomatorServiceServic
             message = config_shortest_paths()
             success = "configured" in message.lower()
             
-            return network_pb2.Response(
+            return service_pb2.Response(
                 success=success,
                 message=message
             )
@@ -162,16 +162,16 @@ class PolkaAutomatorServiceServicer(network_pb2_grpc.PolkaAutomatorServiceServic
             logger.error(f"Erro em ConfigShortestPaths: {e}")
             context.set_code(grpc.StatusCode.INTERNAL)
             context.set_details(str(e))
-            return network_pb2.Response(
+            return service_pb2.Response(
                 success=False,
                 message=f"Erro: {str(e)}"
             )
 
-
-def serve(port=50051, max_workers=10):
+                      # Mininet não é thread-safe
+def serve(port=50051, max_workers=1):
     """Inicia o servidor gRPC"""
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=max_workers))
-    network_pb2_grpc.add_PolkaAutomatorServiceServicer_to_server(
+    service_pb2_grpc.add_PolkaAutomatorServiceServicer_to_server(
         PolkaAutomatorServiceServicer(), server
     )
     
