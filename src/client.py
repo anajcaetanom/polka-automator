@@ -20,13 +20,13 @@ class PolkaAutomatorServiceStub:
         """
         self.address = f'{host}:{port}'
         self.channel = grpc.insecure_channel(self.address)
-        self.stub = network_pb2_grpc.NetworkServiceStub(self.channel)
+        self.stub = service_pb2_grpc.NetworkServiceStub(self.channel)
         logger.info(f"✓ Cliente conectado a {self.address}\n")
     
     def init_net(self):
         """Inicializa a rede Mininet"""
         try:
-            response = self.stub.StartNetwork(network_pb2.Empty())
+            response = self.stub.StartNetwork(service_pb2.Empty())
             return response
         except grpc.RpcError as e:
             logger.error(f"Erro RPC: {e.code()} - {e.details()}")
@@ -35,7 +35,7 @@ class PolkaAutomatorServiceStub:
     def stop_net(self):
         """Para a rede Mininet"""
         try:
-            response = self.stub.StopNetwork(network_pb2.Empty())
+            response = self.stub.StopNetwork(service_pb2.Empty())
             return response
         except grpc.RpcError as e:
             logger.error(f"Erro RPC: {e.code()} - {e.details()}")
@@ -44,7 +44,7 @@ class PolkaAutomatorServiceStub:
     def show_paths(self, source, target):
         """Mostra todos os caminhos entre source e target"""
         try:
-            request = network_pb2.PathRequest(source=source, target=target)
+            request = service_pb2.ShowPathsRequest(source=source, target=target)
             response = self.stub.ShowPaths(request)
             return response
         except grpc.RpcError as e:
@@ -54,7 +54,7 @@ class PolkaAutomatorServiceStub:
     def config_single_path(self, index, source, target):
         """Configura um caminho específico"""
         try:
-            request = network_pb2.SinglePathRequest(
+            request = service_pb2.ConfigPathRequest(
                 index=index,
                 source=source,
                 target=target
@@ -68,7 +68,7 @@ class PolkaAutomatorServiceStub:
     def config_shortest_paths(self):
         """Configura os caminhos mais curtos"""
         try:
-            response = self.stub.ConfigShortestPaths(network_pb2.Empty())
+            response = self.stub.ConfigShortestPaths(service_pb2.Empty())
             return response
         except grpc.RpcError as e:
             logger.error(f"Erro RPC: {e.code()} - {e.details()}")
@@ -77,4 +77,4 @@ class PolkaAutomatorServiceStub:
     def close(self):
         """Fecha a conexão com o servidor"""
         self.channel.close()
-        logger.info("\n✓ Conexão fechada")
+        logger.info("\n Conexão fechada")
