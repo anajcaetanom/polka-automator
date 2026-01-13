@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 class PolkaAutomatorServiceServicer(network_pb2_grpc.PolkaAutomatorServiceServicer):
     """Implementação do serviço gRPC"""
     
-    def InitNet(self, request, context):
+    def StartNetwork(self, request, context):
         """Inicializa a rede Mininet"""
         try:
             logger.info("Chamada InitNet recebida")
@@ -44,7 +44,7 @@ class PolkaAutomatorServiceServicer(network_pb2_grpc.PolkaAutomatorServiceServic
                 message=f"Erro: {str(e)}"
             )
     
-    def StopNet(self, request, context):
+    def StopNetwork(self, request, context):
         """Para a rede Mininet"""
         try:
             logger.info("Chamada StopNet recebida")
