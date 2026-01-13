@@ -1,8 +1,8 @@
 import logging
 import grpc
 from concurrent import futures
-import network_pb2
-import network_pb2_grpc
+import service_pb2
+import service_pb2_grpc
 
 # Importa suas funções originais
 from service import (
