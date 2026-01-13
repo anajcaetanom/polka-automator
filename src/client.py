@@ -26,7 +26,7 @@ class PolkaAutomatorServiceStub:
     def init_net(self):
         """Inicializa a rede Mininet"""
         try:
-            response = self.stub.InitNet(network_pb2.Empty())
+            response = self.stub.StartNetwork(network_pb2.Empty())
             return response
         except grpc.RpcError as e:
             logger.error(f"Erro RPC: {e.code()} - {e.details()}")
@@ -35,7 +35,7 @@ class PolkaAutomatorServiceStub:
     def stop_net(self):
         """Para a rede Mininet"""
         try:
-            response = self.stub.StopNet(network_pb2.Empty())
+            response = self.stub.StopNetwork(network_pb2.Empty())
             return response
         except grpc.RpcError as e:
             logger.error(f"Erro RPC: {e.code()} - {e.details()}")
