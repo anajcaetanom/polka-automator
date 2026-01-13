@@ -1,6 +1,6 @@
 import grpc
-import network_pb2
-import network_pb2_grpc
+import service_pb2
+import service_pb2_grpc
 import logging
 
 logging.basicConfig(level=logging.INFO, format='%(message)s')
