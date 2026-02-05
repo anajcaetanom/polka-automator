@@ -4,7 +4,10 @@ import subprocess
 import networkx
 import grpc
 
+from typing import List
+
 from utils.file_utils import get_gml_file
+
 from utils.network_utils import (
     loadNXtopology, 
     attribute_node_ids, 
@@ -17,7 +20,6 @@ from utils.network_utils import (
     get_leaf_to_core_port_from_path
 )
 
-from mininet.cli import CLI
 from polka.tools import calculate_routeid, shifting
 
 # constantes
@@ -63,7 +65,7 @@ def stop_net() -> str:
     return "Mininet stopped."
 
 
-def show_paths(source: str, target: str) -> list[str]:
+def show_paths(source: str, target: str) -> List[str]:
     global networx_topo
     all_paths = get_all_paths_between_hosts(networx_topo, source, target)
     if not all_paths:

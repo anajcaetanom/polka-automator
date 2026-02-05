@@ -9,9 +9,6 @@ from utils.file_utils import contains_line
 from mn_wifi.net import Mininet_wifi
 from mn_wifi.bmv2 import P4Switch
 
-from utils.network_utils import *
-
-
 
 def run_net(net):
     """

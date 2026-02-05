@@ -3,8 +3,9 @@ import grpc
 from concurrent import futures
 import service_pb2
 import service_pb2_grpc
+import time
 
-# Importa suas funções originais
+
 from service import (
     init_net,
     stop_net,
@@ -13,10 +14,11 @@ from service import (
     config_shortest_paths,
 )
 
+
 # Configuração de logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    format='%(message)s'
 )
 logger = logging.getLogger(__name__)
 
@@ -27,7 +29,7 @@ class PolkaAutomatorServiceServicer(service_pb2_grpc.PolkaAutomatorServiceServic
     def StartNetwork(self, request, context):
         """Inicializa a rede Mininet"""
         try:
-            logger.info("Chamada InitNet recebida")
+            logger.info("Chamada StartNetwork recebida")
             message = init_net()
             success = "already running" in message.lower() or "inicialized" in message.lower()
             
@@ -36,7 +38,7 @@ class PolkaAutomatorServiceServicer(service_pb2_grpc.PolkaAutomatorServiceServic
                 message=message
             )
         except Exception as e:
-            logger.error(f"Erro em InitNet: {e}")
+            logger.error(f"Erro em StartNetwork: {e}")
             context.set_code(grpc.StatusCode.INTERNAL)
             context.set_details(str(e))
             return service_pb2.Response(
@@ -47,16 +49,16 @@ class PolkaAutomatorServiceServicer(service_pb2_grpc.PolkaAutomatorServiceServic
     def StopNetwork(self, request, context):
         """Para a rede Mininet"""
         try:
-            logger.info("Chamada StopNet recebida")
+            logger.info("Chamada StopNetwork recebida")
             message = stop_net()
-            success = "stopped" in message.lower()
+            success = "stopped" in message.lower() or "not running" in message.lower()
             
             return service_pb2.Response(
                 success=success,
                 message=message
             )
         except Exception as e:
-            logger.error(f"Erro em StopNet: {e}")
+            logger.error(f"Erro em StopNetwork: {e}")
             context.set_code(grpc.StatusCode.INTERNAL)
             context.set_details(str(e))
             return service_pb2.Response(
@@ -183,7 +185,8 @@ def serve(port=50051, max_workers=1):
     logger.info("Servidor gRPC rodando...")
     
     try:
-        server.wait_for_termination()
+        while True:
+            time.sleep(86400)
     except KeyboardInterrupt:
         logger.info("Encerrando servidor...")
         server.stop(0)
