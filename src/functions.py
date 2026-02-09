@@ -14,7 +14,6 @@ from utils.network_utils import (
     decimal_to_binary,
     get_output_ports_list,
     get_leaf_to_core_port_from_path,
-    
 )
 
 
