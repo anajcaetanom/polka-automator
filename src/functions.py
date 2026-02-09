@@ -3,10 +3,9 @@ import networkx
 
 from mininet.cli import CLI
 from polka.tools import calculate_routeid, shifting
-from utils.user_interface import (
-    get_host,
-    menu2,
-)
+
+from utils.file_utils import contains_line, clean_and_sort_file
+from utils.user_interface import get_host, menu2
 from utils.network_utils import (
     get_all_paths_between_hosts,
     hex_node_id,
@@ -17,10 +16,7 @@ from utils.network_utils import (
     get_leaf_to_core_port_from_path,
     
 )
-from utils.file_utils import (
-    contains_line,
-    clean_and_sort_file
-)
+
 
 def config_single_path(project_root, NETWORKX_TOPO, MN_NET, DEBUG) -> None:
     pasta = os.path.join(project_root, "polka", "config")

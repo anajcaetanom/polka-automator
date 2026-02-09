@@ -1,7 +1,7 @@
 import re
 import os
 
-from utils.test_utils import *
+from utils.test_utils import show_nx_topo, print_nodes_by_type
 
 def get_host(prompt):
     """

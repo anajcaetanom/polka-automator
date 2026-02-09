@@ -4,7 +4,10 @@ import networkx
 from mn_wifi.net import Mininet_wifi
 from mn_wifi.bmv2 import P4Switch
 
-from utils.network_utils import *
+from utils.network_utils import (
+    get_node_number,
+    get_connected_edge_number
+)
 
 def loadNXtopology(file):
     """
