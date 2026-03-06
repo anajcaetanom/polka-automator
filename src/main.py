@@ -7,8 +7,8 @@ from functools import partial
 from load_topology import loadNXtopology, loadMininet
 from run_topology import run_net
 from utils.user_interface import choose_topo_menu, menu1
-from utils.network_utils import attribute_node_ids
-from functions import (
+from utils.network_utils import attribute_node_ids, config_core_nodes
+from menu_calls import (
     config_single_path,
     config_shortest_path,
     empty_all_tables,
@@ -39,12 +39,18 @@ if __name__ == "__main__":
     print("\nStarting mininet...")
     run_net(MN_NET) 
 
+    pasta = os.path.join(project_root, "polka", "config")
+    if not os.path.exists(pasta):
+        os.makedirs(pasta)
+
+    config_core_nodes(NETWORKX_TOPO, MN_NET, pasta)
+
     menu_actions = {
-        1: partial(config_single_path, project_root, NETWORKX_TOPO, MN_NET, DEBUG),
+        1: partial(config_single_path, pasta, NETWORKX_TOPO, MN_NET, DEBUG),
         2: partial(config_shortest_path, NETWORKX_TOPO, MN_NET, DEBUG),
-        3: partial(empty_all_tables, project_root, NETWORKX_TOPO),
-        4: partial(start_mininet_CLI, MN_NET),
-        5: partial(ping_all_paths, project_root, MN_NET)
+        3: partial(start_mininet_CLI, MN_NET),
+        4: partial(ping_all_paths, project_root, MN_NET),
+        5: partial(empty_all_tables, project_root, NETWORKX_TOPO)
     }
 
     while True:

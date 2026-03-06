@@ -3,6 +3,7 @@ import csv
 import sys
 import ast
 import os
+from utils.file_utils import contains_line
 
 def get_node_number(node):
     """
@@ -261,6 +262,23 @@ def extract_polys_from_csv(file_path):
                         buffer = ''
 
     print("Polynomials extracted from CSV.")
+
+def config_core_nodes(NETWORKX_TOPO, MN_NET, pasta):
+    for node in NETWORKX_TOPO.nodes():
+        if NETWORKX_TOPO.nodes[node]['type'] == 'core':
+            node_id = NETWORKX_TOPO.nodes[node]['node_id']
+            hex_node = hex_node_id(node_id)
+            linha = f"set_crc16_parameters calc {hex_node} 0x0 0x0 false false"
+            partes = linha.split()
+            switch = MN_NET.get(node)
+            switch.bmv2Thrift(*partes) #injeta direto no switch
+
+            # escreve no txt
+            filename = f'{node}-commands.txt'
+            complete_path = os.path.join(pasta, filename)
+            if not contains_line(complete_path, linha):
+                with open(complete_path, 'w') as arquivo:
+                    arquivo.write(linha)
 
 if __name__ == '__main__':
     BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))

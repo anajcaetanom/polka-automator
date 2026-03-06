@@ -24,11 +24,11 @@ def menu1():
     while True:
         try:
             print("\nMenu:")
-            print("1. Choose a single path.")
-            print("2. Generate route-ID for all paths.")
-            print("3. Empty all tables.")
-            print("4. Open Mininet CLI.")
-            print("5. Ping all paths (non-linear topology).")
+            print("1. Config a single path.")
+            print("2. Config all hosts (shortest path).")
+            print("3. Open Mininet CLI.")
+            print("4. Ping all paths (ainda to fazendo essa).")
+            print("5. Empty all txt files.")
             print("0. Exit.")
 
             action = input("\nSelect an option: ").strip()

@@ -17,11 +17,7 @@ from utils.network_utils import (
 )
 
 
-def config_single_path(project_root, NETWORKX_TOPO, MN_NET, DEBUG) -> None:
-    pasta = os.path.join(project_root, "polka", "config")
-    if not os.path.exists(pasta):
-        os.makedirs(pasta)
-
+def config_single_path(pasta, NETWORKX_TOPO, MN_NET, DEBUG) -> None:
     source = get_host("\nType the source host (ex: h1): ")
     target = get_host("Type the target host (ex: h2): ")
 
@@ -34,18 +30,6 @@ def config_single_path(project_root, NETWORKX_TOPO, MN_NET, DEBUG) -> None:
     chosen_path = menu2(all_paths)
     if chosen_path == 0:
         return
-
-    ################ core nodes ################
-    for node in chosen_path:
-        if NETWORKX_TOPO.nodes[node]['type'] == 'core':
-            node_id = NETWORKX_TOPO.nodes[node]['node_id']
-            hex_node = hex_node_id(node_id)
-            linha = f"set_crc16_parameters calc {hex_node} 0x0 0x0 false false"
-            filename = f'{node}-commands.txt'
-            complete_path = os.path.join(pasta, filename)
-            if not contains_line(complete_path, linha):
-                with open(complete_path, 'w') as arquivo:
-                    arquivo.write(linha)
     
     ################# edge nodes #################  
     path_node_ids = get_node_ids(NETWORKX_TOPO, chosen_path)
@@ -60,20 +44,23 @@ def config_single_path(project_root, NETWORKX_TOPO, MN_NET, DEBUG) -> None:
 
     second_node = chosen_path[1]
     if NETWORKX_TOPO.nodes[second_node].get('type') == 'leaf':
-        node_number = get_node_number(second_node)
-    filename = f'e{node_number}-commands.txt'
-    complete_path = os.path.join(pasta, filename)
-    first_line = "table_set_default tunnel_encap_process_sr tdrop"
-    if not contains_line(complete_path, first_line):
-        with open(complete_path, 'a') as arquivo:  # 'a' = append
-            arquivo.write(first_line)
-    if not contains_line(complete_path, linha):
-        with open(complete_path, 'a') as arquivo:  
-            arquivo.write('\n' + linha)
-        clean_and_sort_file(complete_path)
-        print('\nInfos adicionadas na tabela.')
-    else:
-        print("Table already contains that line.")
+        partes = linha.split()
+        switch = MN_NET.get(second_node)
+        switch.bmv2Thrift(*partes)
+
+        filename = f'{second_node}-commands.txt'
+        complete_path = os.path.join(pasta, filename)
+        first_line = "table_set_default tunnel_encap_process_sr tdrop"
+        if not contains_line(complete_path, first_line):
+            with open(complete_path, 'a') as arquivo:  # 'a' = append
+                arquivo.write(first_line)
+        if not contains_line(complete_path, linha):
+            with open(complete_path, 'a') as arquivo:  
+                arquivo.write('\n' + linha)
+            clean_and_sort_file(complete_path)
+            print('\nInfos adicionadas na tabela.')
+        else:
+            print("Table already contains that line.")
     
     ############### VOLTA ###############
     path_volta = chosen_path[::-1] # ?só inverti o caminho escolhido?
@@ -87,24 +74,27 @@ def config_single_path(project_root, NETWORKX_TOPO, MN_NET, DEBUG) -> None:
 
     linha = f"table_add tunnel_encap_process_sr add_sourcerouting_header {target_ip}/32 => {output_port} {target_mac} {routeID_int}"
 
-    second_node = chosen_path[1]
+    second_node = path_volta[1]
     if NETWORKX_TOPO.nodes[second_node].get('type') == 'leaf':
-        node_number = get_node_number(second_node)
-    filename = f'e{node_number}-commands.txt'
-    complete_path = os.path.join(pasta, filename)
-    first_line = "table_set_default tunnel_encap_process_sr tdrop"
-    if not contains_line(complete_path, first_line):
-        with open(complete_path, 'a') as arquivo:  # 'a' = append
-            arquivo.write(first_line)
-    if not contains_line(complete_path, linha):
-        with open(complete_path, 'a') as arquivo:
-            arquivo.write('\n' + linha)
-        clean_and_sort_file(complete_path)
-        print('\nInfos adicionadas na tabela.')
-    else:
-        print("Table already contains that line.")
+        partes = linha.split()
+        switch = MN_NET.get(second_node)
+        switch.bmv2Thrift(*partes)
 
-    print("\nYou have altered tables. Please reboot the mininet topology.\n")
+        filename = f'{second_node}-commands.txt'
+        complete_path = os.path.join(pasta, filename)
+        first_line = "table_set_default tunnel_encap_process_sr tdrop"
+        if not contains_line(complete_path, first_line):
+            with open(complete_path, 'a') as arquivo:  # 'a' = append
+                arquivo.write(first_line)
+        if not contains_line(complete_path, linha):
+            with open(complete_path, 'a') as arquivo:  
+                arquivo.write('\n' + linha)
+            clean_and_sort_file(complete_path)
+            print('\nInfos adicionadas na tabela.')
+        else:
+            print("Table already contains that line.")
+
+    print("\nPath configured.\n")
 
 def config_shortest_path(NETWORKX_TOPO, MN_NET, DEBUG) -> None:
     hosts = MN_NET.hosts 
@@ -181,12 +171,10 @@ def ping_all_paths(project_root, MN_NET):
     hosts = MN_NET.hosts
 
     for i in range(len(hosts)):
-        source = hosts[i].name2w
+        source = hosts[i].name
 
-        host_number = get_node_number(source)
-        switch_label = f'e{host_number}'
-        switch = MN_NET.get(switch_label)
-        filename = f'{switch_label}-commands.txt'
+        switch = MN_NET.get(source)
+        filename = f'{source}-commands.txt'
         complete_path = os.path.join(pasta, filename)
         with open(complete_path, 'r') as arquivo:
             next(arquivo) # pula a primeira linha

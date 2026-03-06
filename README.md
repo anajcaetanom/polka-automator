@@ -90,15 +90,57 @@ The main goal of this project is to simplify the manipulation of network topolog
 - Whenever you **modify the tables**, you must **restart Mininet** for the changes to take effect.  
 ---
 
+## Menu Options
+
+
+1. **Configure a Single Path**
+
+    This option allows configuring a specific path between two hosts in the network.
+    Based on the selected path, the necessary forwarding rules are installed in the switches so that packets follow the defined route.
+    
+    The configuration is applied directly to the switches and is also written to the .txt config file.
+
+1. **Configure All Hosts (Shortest Paths)**
+
+    This option automatically configures communication between all hosts in the network using the shortest paths available in the topology.
+
+    For every pair of hosts, the program computes the shortest path and installs the necessary forwarding rules in the switches.
+
+    The configuration is applied directly to the switches and is also written to the .txt config file.
+
+1. **Open Mininet CLI**
+
+    This option opens the Mininet CLI, allowing direct interaction with the running network.
+
+1. **Ping all paths**
+
+    This option tests connectivity for multiple possible paths between hosts, which is especially useful in non-linear topologies where more than one route may exist.
+
+    For each path found between hosts, the script:
+
+    - Injects the corresponding configuration into the switches.
+
+    - Executes a ping test between the hosts using that path.
+
+    This allows testing whether different routing paths are working correctly.
+
+    The results of the ping tests are recorded and saved to .txt files for later analysis.
+
+    > Note: This feature is still under development.
+
+1. **Empty all txt files**
+
+    This option removes the contents of every `*-commands.txt` file inside the `polka/config` directory. 
+
+    > **Note:** After using this option, the Mininet topology must be restarted so the changes take effect.
+
+- **0. Exit**
+
+    Terminates the menu program.
+
+    Before exiting, the script runs a Mininet cleanup to remove any remaining network namespaces, interfaces, and processes created by the topology. This ensures the environment is reset and avoids conflicts when starting Mininet again.
+
 ## Usage Examples and Results
-
-### Menu
-
-The following image shows the first menu displayed when running main.py.
-![First menu](docs/images/choose_topo.png)
-
-The second image shows the next menu, where users can select different options to configure the topology, run tests, and interact with the PolKA environment after choosing the GML file.
-![Main menu](docs/images/menu.png)
 
 ### Mininet Topology
 
